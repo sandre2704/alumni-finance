@@ -1,0 +1,101 @@
+import { Router, Request, Response, NextFunction } from 'express';
+import { profileService } from '../services/profile.service.js';
+import { auth } from '../lib/auth.js';
+import { fromNodeHeaders } from 'better-auth/node';
+
+const router = Router();
+
+/**
+ * Middleware to get current user from session
+ */
+async function getCurrentUser(req: Request, res: Response, next: NextFunction) {
+    try {
+        const session = await auth.api.getSession({
+            headers: fromNodeHeaders(req.headers)
+        });
+
+        if (!session?.user) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        (req as any).user = session.user;
+        next();
+    } catch (error) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+}
+
+/**
+ * POST /api/profile/complete
+ * Complete profile with username and password
+ */
+router.post('/complete', getCurrentUser, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = (req as any).user.id;
+        const { username, password, confirmPassword } = req.body;
+
+        // Validate required fields
+        if (!username || !password) {
+            return res.status(400).json({ error: 'Username dan password wajib diisi' });
+        }
+
+        // Validate password confirmation
+        if (password !== confirmPassword) {
+            return res.status(400).json({ error: 'Konfirmasi password tidak cocok' });
+        }
+
+        const result = await profileService.completeProfile(userId, { username, password });
+        res.json({ success: true, user: result });
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
+ * GET /api/profile/status
+ * Get profile completion status
+ */
+router.get('/status', getCurrentUser, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = (req as any).user.id;
+        const status = await profileService.getProfileStatus(userId);
+        res.json(status);
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
+ * GET /api/profile/check-username/:username
+ * Check if username is available
+ */
+router.get('/check-username/:username', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { username } = req.params;
+        const available = await profileService.checkUsernameAvailable(username);
+        res.json({ available });
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
+ * GET /api/profile/get-email-by-username/:username
+ * Get user email by username (for login with username)
+ */
+router.get('/get-email-by-username/:username', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { username } = req.params;
+        const email = await profileService.getEmailByUsername(username);
+        if (email) {
+            res.json({ email });
+        } else {
+            res.status(404).json({ error: 'Username tidak ditemukan' });
+        }
+    } catch (error) {
+        next(error);
+    }
+});
+
+export default router;
+

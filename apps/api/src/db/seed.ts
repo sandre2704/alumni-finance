@@ -10,14 +10,14 @@ async function seed() {
     // 1. Seed Categories
     console.log('📁 Seeding categories...');
     const incomeCats = [
-        { name: 'Iuran Wajib', slug: 'iuran_wajib', type: 'income' as const },
-        { name: 'Sumbangan', slug: 'sumbangan', type: 'income' as const },
-        { name: 'Sponsor', slug: 'sponsor', type: 'income' as const },
+        { id: crypto.randomUUID(), name: 'Iuran Wajib', slug: 'iuran_wajib', type: 'income' as const },
+        { id: crypto.randomUUID(), name: 'Sumbangan', slug: 'sumbangan', type: 'income' as const },
+        { id: crypto.randomUUID(), name: 'Sponsor', slug: 'sponsor', type: 'income' as const },
     ];
     const expenseCats = [
-        { name: 'Operasional', slug: 'operasional', type: 'expense' as const },
-        { name: 'Perlengkapan', slug: 'perlengkapan', type: 'expense' as const },
-        { name: 'Konsumsi', slug: 'konsumsi', type: 'expense' as const },
+        { id: crypto.randomUUID(), name: 'Operasional', slug: 'operasional', type: 'expense' as const },
+        { id: crypto.randomUUID(), name: 'Perlengkapan', slug: 'perlengkapan', type: 'expense' as const },
+        { id: crypto.randomUUID(), name: 'Konsumsi', slug: 'konsumsi', type: 'expense' as const },
     ];
 
     await db.insert(categories).values([...incomeCats, ...expenseCats]).onConflictDoNothing();

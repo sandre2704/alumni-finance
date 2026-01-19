@@ -82,15 +82,13 @@ export const Navbar = () => {
                     >
                         Transaksi
                     </Link>
-                    {isAdmin && (
-                        <Link
-                            to="/settings"
-                            onClick={() => window.scrollTo(0, 0)}
-                            className={`font-medium text-sm leading-normal transition-colors ${isActive('/settings') ? 'text-primary font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
-                        >
-                            Pengaturan
-                        </Link>
-                    )}
+                    <Link
+                        to="/settings"
+                        onClick={() => window.scrollTo(0, 0)}
+                        className={`font-medium text-sm leading-normal transition-colors ${isActive('/settings') ? 'text-primary font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
+                    >
+                        Pengaturan
+                    </Link>
                 </div>
                 <div className="flex items-center gap-4">
                     {/* Notification Bell - Only for Admin */}

@@ -97,5 +97,26 @@ router.get('/get-email-by-username/:username', async (req: Request, res: Respons
     }
 });
 
+/**
+ * POST /api/profile/change-password
+ * Change user password
+ */
+router.post('/change-password', getCurrentUser, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = (req as any).user.id;
+        const { oldPassword, newPassword, confirmPassword } = req.body;
+
+        // Validate
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            return res.status(400).json({ error: 'Semua field harus diisi' });
+        }
+
+        await profileService.changePassword(userId, { oldPassword, newPassword, confirmPassword });
+        res.json({ success: true, message: 'Password berhasil diubah' });
+    } catch (error) {
+        next(error);
+    }
+});
+
 export default router;
 

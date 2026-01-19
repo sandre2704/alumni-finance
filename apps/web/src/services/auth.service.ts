@@ -65,6 +65,32 @@ export const AuthService = {
     getSession: async (): Promise<User | null> => {
         const { data } = await authClient.getSession();
         return data?.user as User || null;
+    },
+
+    forgotPassword: async (email: string) => {
+        const { data, error } = await authClient.requestPasswordReset({
+            email,
+            redirectTo: "/reset-password",
+        });
+
+        if (error) {
+            throw error;
+        }
+
+        return data;
+    },
+
+    resetPassword: async (newPassword: string, token: string) => {
+        const { data, error } = await authClient.resetPassword({
+            newPassword,
+            token
+        });
+
+        if (error) {
+            throw error;
+        }
+
+        return data;
     }
 };
 

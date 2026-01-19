@@ -591,6 +591,33 @@ const UsersSection = () => {
 
 const ProfileSection = () => {
     const { user } = useAuth();
+    const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+    const [passwordData, setPasswordData] = useState({
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
+
+    const changePasswordMutation = useMutation({
+        mutationFn: UserService.changePassword,
+        onSuccess: () => {
+            setIsChangePasswordOpen(false);
+            setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' });
+            alert('Password berhasil diubah!');
+        },
+        onError: (error: any) => {
+            alert(`Gagal mengubah password: ${error.response?.data?.message || error.message}`);
+        }
+    });
+
+    const handleChangePassword = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            alert('Konfirmasi password tidak cocok');
+            return;
+        }
+        changePasswordMutation.mutate(passwordData);
+    };
 
     return (
         <div className="max-w-2xl">
@@ -632,11 +659,81 @@ const ProfileSection = () => {
                 </div>
 
                 <div className="pt-4 flex justify-end">
-                    <button className="px-4 py-2 text-sm font-medium text-primary hover:text-primary-dark transition-colors">
+                    <button
+                        onClick={() => setIsChangePasswordOpen(true)}
+                        className="px-4 py-2 text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+                    >
                         Ubah Password
                     </button>
                 </div>
             </div>
+
+            {/* Change Password Modal */}
+            {isChangePasswordOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-card-dark rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+                        <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-card-border">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Ubah Password</h3>
+                            <button onClick={() => setIsChangePasswordOpen(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <form onSubmit={handleChangePassword} className="p-4 space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password Lama</label>
+                                <input
+                                    type="password"
+                                    required
+                                    value={passwordData.oldPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
+                                    className="w-full h-10 px-3 rounded-lg bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50 text-gray-900 dark:text-white placeholder-gray-400"
+                                    placeholder="Masukkan password lama"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password Baru</label>
+                                <input
+                                    type="password"
+                                    required
+                                    minLength={8}
+                                    value={passwordData.newPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                    className="w-full h-10 px-3 rounded-lg bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50 text-gray-900 dark:text-white placeholder-gray-400"
+                                    placeholder="Minimal 8 karakter"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Konfirmasi Password Baru</label>
+                                <input
+                                    type="password"
+                                    required
+                                    value={passwordData.confirmPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                    className="w-full h-10 px-3 rounded-lg bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50 text-gray-900 dark:text-white placeholder-gray-400"
+                                    placeholder="Ulangi password baru"
+                                />
+                            </div>
+
+                            <div className="pt-2 flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsChangePasswordOpen(false)}
+                                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                >
+                                    Batal
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={changePasswordMutation.isPending}
+                                    className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {changePasswordMutation.isPending ? 'Menyimpan...' : 'Simpan Password'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -1,20 +1,74 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { signUp } from '../lib/auth-client';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 export const Register = () => {
     const [name, setName] = useState('');
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
+    const [usernameError, setUsernameError] = useState('');
     const [success, setSuccess] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isCheckingUsername, setIsCheckingUsername] = useState(false);
     const navigate = useNavigate();
+
+    // Check username availability with debounce
+    useEffect(() => {
+        if (username.length < 3) {
+            if (username.length > 0) {
+                setUsernameError('Username minimal 3 karakter');
+            }
+            return;
+        }
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            setUsernameError('Username hanya boleh huruf, angka, dan underscore');
+            return;
+        }
+
+        const timer = setTimeout(async () => {
+            setIsCheckingUsername(true);
+            try {
+                const response = await fetch(`${API_URL}/api/profile/check-username/${username}`);
+                const data = await response.json();
+                if (!data.available) {
+                    setUsernameError('Username sudah digunakan');
+                } else {
+                    setUsernameError('');
+                }
+            } catch (err) {
+                console.error('Error checking username:', err);
+            } finally {
+                setIsCheckingUsername(false);
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [username]);
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setError('');
+
+        // Validate username
+        if (username.length < 3 || username.length > 20) {
+            setError('Username harus 3-20 karakter');
+            return;
+        }
+
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            setError('Username hanya boleh huruf, angka, dan underscore');
+            return;
+        }
+
+        if (usernameError) {
+            setError(usernameError);
+            return;
+        }
 
         if (password !== confirmPassword) {
             setError('Password tidak cocok');
@@ -33,6 +87,7 @@ export const Register = () => {
                 email,
                 password,
                 name,
+                username, // Include username in registration
             });
 
             if (signUpError) {
@@ -63,6 +118,11 @@ export const Register = () => {
                             Kami telah mengirim link verifikasi ke <strong className="text-slate-700 dark:text-slate-200">{email}</strong>.
                             Silakan cek inbox Anda dan klik link untuk mengaktifkan akun.
                         </p>
+                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+                            <p className="text-sm text-blue-700 dark:text-blue-300">
+                                <strong>Tip:</strong> Jika tidak menemukan email, cek folder Spam/Junk.
+                            </p>
+                        </div>
                         <div className="space-y-3">
                             <Link
                                 to="/login"
@@ -120,6 +180,33 @@ export const Register = () => {
                         </label>
 
                         <label className="flex flex-col w-full">
+                            <span className="text-sm font-medium leading-normal pb-2 text-slate-900 dark:text-white">Username</span>
+                            <div className="relative flex items-center">
+                                <span className="absolute left-4 material-symbols-outlined text-[#9292c8]">alternate_email</span>
+                                <input
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value.toLowerCase())}
+                                    className={`flex w-full min-w-0 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-primary/50 border ${usernameError ? 'border-red-500' : 'border-slate-300 dark:border-border-dark'} bg-slate-50 dark:bg-input-dark focus:border-primary h-12 placeholder:text-[#9292c8] pl-12 pr-12 text-base font-normal leading-normal transition-all`}
+                                    placeholder="Masukkan username"
+                                    type="text"
+                                    required
+                                    minLength={3}
+                                    maxLength={20}
+                                />
+                                {isCheckingUsername && (
+                                    <span className="absolute right-4 text-slate-400 text-xs">Checking...</span>
+                                )}
+                                {!isCheckingUsername && username.length >= 3 && !usernameError && (
+                                    <span className="absolute right-4 material-symbols-outlined text-green-500 text-xl">check_circle</span>
+                                )}
+                            </div>
+                            {usernameError && (
+                                <span className="text-xs text-red-500 mt-1">{usernameError}</span>
+                            )}
+                            <span className="text-xs text-slate-400 mt-1">3-20 karakter, huruf kecil, angka, underscore</span>
+                        </label>
+
+                        <label className="flex flex-col w-full">
                             <span className="text-sm font-medium leading-normal pb-2 text-slate-900 dark:text-white">Email</span>
                             <div className="relative flex items-center">
                                 <span className="absolute left-4 material-symbols-outlined text-[#9292c8]">mail</span>
@@ -157,18 +244,27 @@ export const Register = () => {
                                 <input
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="flex w-full min-w-0 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-300 dark:border-border-dark bg-slate-50 dark:bg-input-dark focus:border-primary h-12 placeholder:text-[#9292c8] pl-12 pr-4 text-base font-normal leading-normal transition-all"
+                                    className={`flex w-full min-w-0 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-primary/50 border ${confirmPassword && confirmPassword !== password ? 'border-red-500' : 'border-slate-300 dark:border-border-dark'} bg-slate-50 dark:bg-input-dark focus:border-primary h-12 placeholder:text-[#9292c8] pl-12 pr-12 text-base font-normal leading-normal transition-all`}
                                     placeholder="Ulangi password"
                                     type="password"
                                     required
                                 />
+                                {confirmPassword && confirmPassword === password && (
+                                    <span className="absolute right-4 material-symbols-outlined text-green-500 text-xl">check_circle</span>
+                                )}
+                                {confirmPassword && confirmPassword !== password && (
+                                    <span className="absolute right-4 material-symbols-outlined text-red-500 text-xl">error</span>
+                                )}
                             </div>
+                            {confirmPassword && confirmPassword !== password && (
+                                <span className="text-xs text-red-500 mt-1">Password tidak cocok</span>
+                            )}
                         </label>
 
                         <div className="pt-2">
                             <button
                                 type="submit"
-                                disabled={isLoading}
+                                disabled={isLoading || !!usernameError || isCheckingUsername}
                                 className="w-full h-12 flex items-center justify-center rounded-lg bg-primary hover:bg-blue-700 text-white text-base font-bold leading-normal tracking-[0.015em] transition-all shadow-lg shadow-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isLoading ? 'Mendaftar...' : 'Daftar'}

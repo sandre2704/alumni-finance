@@ -147,6 +147,54 @@ class ProfileService {
 
         return user?.email || null;
     }
+    /**
+     * Change user password
+     */
+    async changePassword(userId: string, data: { oldPassword: string; newPassword: string; confirmPassword: string }) {
+        if (data.newPassword !== data.confirmPassword) {
+            throw new AppError(400, 'Konfirmasi password tidak cocok');
+        }
+
+        if (data.newPassword.length < 8) {
+            throw new AppError(400, 'Password baru minimal 8 karakter');
+        }
+
+        // Get credential account
+        const credentialAccount = await db.query.account.findFirst({
+            where: and(
+                eq(account.userId, userId),
+                eq(account.providerId, 'credential')
+            ),
+        });
+
+        if (!credentialAccount) {
+            throw new AppError(400, 'Akun ini tidak menggunakan login password (mungkin Google Login?)');
+        }
+
+        // Verify old password
+        const ctx = await auth.$context;
+        const isValid = await ctx.password.verify({
+            hash: credentialAccount.password!,
+            password: data.oldPassword
+        });
+
+        if (!isValid) {
+            throw new AppError(400, 'Password lama salah');
+        }
+
+        // Hash new password
+        const hashedPassword = await hashPassword(data.newPassword);
+
+        // Update password
+        await db.update(account)
+            .set({
+                password: hashedPassword,
+                updatedAt: new Date()
+            })
+            .where(eq(account.id, credentialAccount.id));
+
+        return true;
+    }
 }
 
 export const profileService = new ProfileService();

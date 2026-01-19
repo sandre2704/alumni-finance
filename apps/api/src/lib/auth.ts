@@ -30,9 +30,9 @@ export const auth = betterAuth({
     },
     emailAndPassword: {
         enabled: true,
-        requireEmailVerification: true,
-        sendResetPassword: async ({ user, url }) => {
-            await emailService.sendPasswordResetEmail(user.email, url, user.name);
+        requireEmailVerification: true, // Enabled - users must verify email
+        sendResetPassword: async ({ user, url, token }) => {
+            await emailService.sendPasswordResetEmail(user.email, url, user.name, token);
         },
     },
     emailVerification: {
@@ -41,6 +41,7 @@ export const auth = betterAuth({
         },
         sendOnSignUp: true,
         autoSignInAfterVerification: true,
+        callbackURL: "http://localhost:5173/verify-email?verified=true",
     },
     socialProviders: {
         google: {

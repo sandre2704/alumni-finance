@@ -48,4 +48,8 @@ export const UserService = {
     delete: async (id: string): Promise<void> => {
         await apiClient.delete(`/users/${id}`);
     },
+
+    changePassword: async (data: any): Promise<void> => {
+        await apiClient.post('/profile/change-password', data);
+    },
 };

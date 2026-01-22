@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Navbar } from '../components/Navbar';
+
 import { useAuth } from '../hooks/useAuth';
+import Swal from 'sweetalert2';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { CategoryService, Category } from '../services/category.service';
 import { UserService, User, CreateUserData } from '../services/user.service';
+import { TransferInfoSection } from '../components/TransferInfoSection';
 
 const KategoriSection = () => {
     const queryClient = useQueryClient();
@@ -23,12 +25,23 @@ const KategoriSection = () => {
             queryClient.invalidateQueries({ queryKey: ['categories'] });
             setIsModalOpen(false);
             setNewCategory({ name: '', type: 'income', monthlyBudget: '' });
-            alert('Kategori berhasil ditambahkan!');
+            setNewCategory({ name: '', type: 'income', monthlyBudget: '' });
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: 'Kategori berhasil ditambahkan!',
+                confirmButtonColor: '#3085d6',
+            });
         },
         onError: (error: any) => {
             console.error('Failed to create category:', error);
             const message = error.response?.data?.message || 'Terjadi kesalahan pada server. Mohon coba lagi.';
-            alert(`Gagal menambah kategori: ${message}`);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: `Gagal menambah kategori: ${message}`,
+                confirmButtonColor: '#d33',
+            });
         }
     });
 
@@ -39,12 +52,23 @@ const KategoriSection = () => {
             setIsModalOpen(false);
             setEditingCategory(null);
             setNewCategory({ name: '', type: 'income', monthlyBudget: '' });
-            alert('Kategori berhasil diperbarui!');
+            setNewCategory({ name: '', type: 'income', monthlyBudget: '' });
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: 'Kategori berhasil diperbarui!',
+                confirmButtonColor: '#3085d6',
+            });
         },
         onError: (error: any) => {
             console.error('Failed to update category:', error);
             const message = error.response?.data?.message || 'Terjadi kesalahan pada server. Mohon coba lagi.';
-            alert(`Gagal memperbarui kategori: ${message}`);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: `Gagal memperbarui kategori: ${message}`,
+                confirmButtonColor: '#d33',
+            });
         }
     });
 
@@ -52,11 +76,21 @@ const KategoriSection = () => {
         mutationFn: CategoryService.delete,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['categories'] });
-            alert('Kategori berhasil dihapus!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: 'Kategori berhasil dihapus!',
+                confirmButtonColor: '#3085d6',
+            });
         },
         onError: (error: any) => {
             console.error('Failed to delete category:', error);
-            alert(`Gagal menghapus kategori: ${error.response?.data?.message || error.message}`);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: `Gagal menghapus kategori: ${error.response?.data?.message || error.message}`,
+                confirmButtonColor: '#d33',
+            });
         }
     });
 
@@ -91,9 +125,20 @@ const KategoriSection = () => {
     };
 
     const handleDelete = (id: string, name: string) => {
-        if (window.confirm(`Apakah Anda yakin ingin menghapus kategori "${name}"?`)) {
-            deleteMutation.mutate(id);
-        }
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: `Ingin menghapus kategori "${name}"?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteMutation.mutate(id);
+            }
+        });
     };
 
     const handleCloseModal = () => {
@@ -297,13 +342,19 @@ const UsersSection = () => {
     const queryClient = useQueryClient();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
-    const [formData, setFormData] = useState<CreateUserData & { confirmPassword: string }>({
+    const [searchQuery, setSearchQuery] = useState('');
+    const [formData, setFormData] = useState<CreateUserData & { confirmPassword: string, isActive: boolean, role: string }>({
         username: '',
         email: '',
         name: '',
         password: '',
         confirmPassword: '',
+        isActive: true,
+        role: 'guest',
     });
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
 
     const { data: users, isLoading } = useQuery({
         queryKey: ['users'],
@@ -315,11 +366,21 @@ const UsersSection = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['users'] });
             handleCloseModal();
-            alert('User berhasil ditambahkan!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: 'User berhasil ditambahkan!',
+                confirmButtonColor: '#3085d6',
+            });
         },
         onError: (error: any) => {
             console.error('Failed to create user:', error);
-            alert(`Gagal menambah user: ${error.response?.data?.message || error.message}`);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: `Gagal menambah user: ${error.response?.data?.message || error.message}`,
+                confirmButtonColor: '#d33',
+            });
         }
     });
 
@@ -328,11 +389,21 @@ const UsersSection = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['users'] });
             handleCloseModal();
-            alert('User berhasil diperbarui!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: 'User berhasil diperbarui!',
+                confirmButtonColor: '#3085d6',
+            });
         },
         onError: (error: any) => {
             console.error('Failed to update user:', error);
-            alert(`Gagal memperbarui user: ${error.response?.data?.message || error.message}`);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: `Gagal memperbarui user: ${error.response?.data?.message || error.message}`,
+                confirmButtonColor: '#d33',
+            });
         }
     });
 
@@ -340,11 +411,21 @@ const UsersSection = () => {
         mutationFn: UserService.delete,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['users'] });
-            alert('User berhasil dihapus!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: 'User berhasil dihapus!',
+                confirmButtonColor: '#3085d6',
+            });
         },
         onError: (error: any) => {
             console.error('Failed to delete user:', error);
-            alert(`Gagal menghapus user: ${error.response?.data?.message || error.message}`);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: `Gagal menghapus user: ${error.response?.data?.message || error.message}`,
+                confirmButtonColor: '#d33',
+            });
         }
     });
 
@@ -352,7 +433,7 @@ const UsersSection = () => {
         e.preventDefault();
 
         if (!editingUser && formData.password !== formData.confirmPassword) {
-            alert('Password dan konfirmasi password tidak cocok!');
+            Swal.fire('Error', 'Password dan konfirmasi password tidak cocok!', 'error');
             return;
         }
 
@@ -361,10 +442,12 @@ const UsersSection = () => {
                 username: formData.username,
                 email: formData.email,
                 name: formData.name,
+                isActive: formData.isActive,
+                role: formData.role,
             };
             if (formData.password) {
                 if (formData.password !== formData.confirmPassword) {
-                    alert('Password dan konfirmasi password tidak cocok!');
+                    Swal.fire('Error', 'Password dan konfirmasi password tidak cocok!', 'error');
                     return;
                 }
                 updateData.password = formData.password;
@@ -376,6 +459,7 @@ const UsersSection = () => {
                 email: formData.email,
                 name: formData.name,
                 password: formData.password,
+                isActive: formData.isActive
             });
         }
     };
@@ -383,19 +467,32 @@ const UsersSection = () => {
     const handleEdit = (user: User) => {
         setEditingUser(user);
         setFormData({
-            username: user.username,
+            username: user.username || '',
             email: user.email,
             name: user.name,
             password: '',
             confirmPassword: '',
+            isActive: user.isActive !== undefined ? user.isActive : true,
+            role: user.role || 'guest',
         });
         setIsModalOpen(true);
     };
 
     const handleDelete = (id: string, name: string) => {
-        if (window.confirm(`Apakah Anda yakin ingin menghapus user "${name}"?`)) {
-            deleteMutation.mutate(id);
-        }
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: `Ingin menghapus user "${name}"?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteMutation.mutate(id);
+            }
+        });
     };
 
     const handleCloseModal = () => {
@@ -407,7 +504,30 @@ const UsersSection = () => {
             name: '',
             password: '',
             confirmPassword: '',
+            isActive: true,
+            role: 'guest',
         });
+    };
+
+    const filteredUsers = users?.filter(user =>
+        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (user.username && user.username.toLowerCase().includes(searchQuery.toLowerCase()))
+    ) || [];
+
+    const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+    const paginatedUsers = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    const handlePageChange = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+
+    const stats = {
+        total: users?.length || 0,
+        active: users?.filter(u => u.isActive).length || 0,
+        inactive: users?.filter(u => !u.isActive).length || 0,
     };
 
     if (isLoading) {
@@ -416,67 +536,127 @@ const UsersSection = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            {/* Page Heading & Actions */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Daftar Pengguna</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Kelola pengguna yang dapat mengakses aplikasi.</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Kelola data pengguna dan hak akses.</p>
                 </div>
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary-dark text-white text-sm font-medium transition-colors"
-                >
-                    <span className="material-symbols-outlined text-[20px]">person_add</span>
-                    Tambah User
-                </button>
+                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    {/* Search Bar */}
+                    <div className="relative w-full sm:w-64 md:w-80">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                            <span className="material-symbols-outlined !text-[20px]">search</span>
+                        </div>
+                        <input
+                            className="block w-full rounded-lg border-0 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white bg-white dark:bg-card-dark ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 shadow-sm transition-shadow outline-none"
+                            placeholder="Cari nama atau email..."
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+                    {/* Add Button */}
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="flex items-center justify-center rounded-lg h-[42px] px-5 bg-primary hover:bg-primary-dark text-white text-sm font-bold shadow-lg shadow-primary/20 transition-all active:scale-95 whitespace-nowrap"
+                    >
+                        <span className="material-symbols-outlined mr-2 !text-[20px]">add</span>
+                        Tambah Bendahara
+                    </button>
+                </div>
+            </div>
+
+            {/* Stats Overview */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-2">
+                <div className="bg-white dark:bg-card-dark p-4 rounded-xl border border-gray-200 dark:border-card-border shadow-sm flex items-center gap-4">
+                    <div className="size-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                        <span className="material-symbols-outlined">group</span>
+                    </div>
+                    <div>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">Total Pengurus</p>
+                        <p className="text-gray-900 dark:text-white text-xl font-bold">{stats.total}</p>
+                    </div>
+                </div>
+                <div className="bg-white dark:bg-card-dark p-4 rounded-xl border border-gray-200 dark:border-card-border shadow-sm flex items-center gap-4">
+                    <div className="size-12 rounded-full bg-green-500/10 flex items-center justify-center text-green-600 dark:text-green-400">
+                        <span className="material-symbols-outlined">check_circle</span>
+                    </div>
+                    <div>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">Akun Aktif</p>
+                        <p className="text-gray-900 dark:text-white text-xl font-bold">{stats.active}</p>
+                    </div>
+                </div>
+                <div className="bg-white dark:bg-card-dark p-4 rounded-xl border border-gray-200 dark:border-card-border shadow-sm flex items-center gap-4">
+                    <div className="size-12 rounded-full bg-gray-500/10 flex items-center justify-center text-gray-600 dark:text-gray-400">
+                        <span className="material-symbols-outlined">person_off</span>
+                    </div>
+                    <div>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">Nonaktif</p>
+                        <p className="text-gray-900 dark:text-white text-xl font-bold">{stats.inactive}</p>
+                    </div>
+                </div>
             </div>
 
             {/* Users Table */}
-            <div className="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-card-border overflow-hidden">
+            <div className="w-full bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-card-border shadow-sm overflow-hidden flex flex-col">
                 <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-gray-50 dark:bg-gray-800/50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nama</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Username</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
-                                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Aksi</th>
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
+                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[25%]">Nama Lengkap</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[20%] hidden md:table-cell">Username</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[20%] hidden sm:table-cell">Email</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[15%] hidden lg:table-cell">Role</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[10%] text-center">Status</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[10%] text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                            {users && users.length > 0 ? (
-                                users.map((user) => (
-                                    <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold uppercase">
+                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-card-dark">
+                            {paginatedUsers.length > 0 ? (
+                                paginatedUsers.map((user) => (
+                                    <tr key={user.id} className="group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex items-center">
+                                                <div className="h-10 w-10 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm uppercase">
                                                     {user.name.charAt(0)}
                                                 </div>
-                                                <span className="font-medium text-gray-900 dark:text-white">{user.name}</span>
+                                                <div className="ml-4">
+                                                    <div className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400 md:hidden">@{user.username}</div>
+                                                </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-gray-600 dark:text-gray-300">{user.username}</td>
-                                        <td className="px-6 py-4 text-gray-600 dark:text-gray-300">{user.email}</td>
-                                        <td className="px-6 py-4">
-                                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 capitalize">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">@{user.username}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 hidden sm:table-cell">{user.email}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 hidden lg:table-cell capitalize">
+                                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${user.role === 'admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'}`}>
                                                 {user.role}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className="flex justify-end gap-2">
+                                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border ${user.isActive
+                                                ? 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/20'
+                                                : 'bg-gray-100 dark:bg-gray-700/30 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600/30'
+                                                }`}>
+                                                {user.isActive ? 'Aktif' : 'Nonaktif'}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div className="flex items-center justify-end gap-2">
                                                 <button
                                                     onClick={() => handleEdit(user)}
-                                                    className="p-2 text-gray-400 hover:text-blue-500 transition-colors"
+                                                    className="text-gray-400 hover:text-primary dark:hover:text-white p-1 rounded transition-colors"
                                                     title="Edit"
                                                 >
-                                                    <span className="material-symbols-outlined text-[20px]">edit</span>
+                                                    <span className="material-symbols-outlined !text-[20px]">edit</span>
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(user.id, user.name)}
-                                                    className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                                                    className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 p-1 rounded transition-colors"
                                                     title="Hapus"
                                                 >
-                                                    <span className="material-symbols-outlined text-[20px]">delete</span>
+                                                    <span className="material-symbols-outlined !text-[20px]">delete</span>
                                                 </button>
                                             </div>
                                         </td>
@@ -484,14 +664,75 @@ const UsersSection = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                                        Belum ada pengguna terdaftar.
+                                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                                        Data tidak ditemukan.
                                     </td>
                                 </tr>
                             )}
                         </tbody>
                     </table>
                 </div>
+                {/* Pagination */}
+                {filteredUsers.length > 0 && (
+                    <div className="bg-white dark:bg-card-dark px-6 py-4 flex items-center justify-between border-t border-gray-200 dark:border-card-border">
+                        <div className="flex-1 flex justify-between sm:hidden">
+                            <button
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-card-dark px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50"
+                            >
+                                Previous
+                            </button>
+                            <button
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                                className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-card-dark px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50"
+                            >
+                                Next
+                            </button>
+                        </div>
+                        <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                            <div>
+                                <p className="text-sm text-gray-700 dark:text-gray-400">
+                                    Menampilkan <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> sampai <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredUsers.length)}</span> dari <span className="font-medium">{filteredUsers.length}</span> hasil
+                                </p>
+                            </div>
+                            <div>
+                                <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                                    <button
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                        className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                                    >
+                                        <span className="sr-only">Previous</span>
+                                        <span className="material-symbols-outlined !text-[20px]">chevron_left</span>
+                                    </button>
+                                    {[...Array(totalPages)].map((_, i) => (
+                                        <button
+                                            key={i + 1}
+                                            onClick={() => handlePageChange(i + 1)}
+                                            aria-current={currentPage === i + 1 ? 'page' : undefined}
+                                            className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${currentPage === i + 1
+                                                ? 'z-10 bg-primary text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+                                                : 'text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 focus:z-20 focus:outline-offset-0'
+                                                }`}
+                                        >
+                                            {i + 1}
+                                        </button>
+                                    ))}
+                                    <button
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === totalPages}
+                                        className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                                    >
+                                        <span className="sr-only">Next</span>
+                                        <span className="material-symbols-outlined !text-[20px]">chevron_right</span>
+                                    </button>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Add/Edit User Modal */}
@@ -565,6 +806,40 @@ const UsersSection = () => {
                                     placeholder="Ulangi password"
                                 />
                             </div>
+
+                            {/* Role Selection */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
+                                <select
+                                    value={formData.role}
+                                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                    className="w-full h-10 px-3 rounded-lg bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50 text-gray-900 dark:text-white"
+                                >
+                                    <option value="guest">Guest</option>
+                                    <option value="bendahara">Bendahara</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+
+                            {/* Status Toggle */}
+                            <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+                                <div>
+                                    <label className="text-sm font-medium text-gray-900 dark:text-white">Status Akun</label>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        {formData.isActive ? 'User dapat login ke aplikasi' : 'User tidak dapat login'}
+                                    </p>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        className="sr-only peer"
+                                        checked={formData.isActive}
+                                        onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                                    />
+                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                                </label>
+                            </div>
+
                             <div className="pt-2 flex justify-end gap-3">
                                 <button
                                     type="button"
@@ -738,7 +1013,7 @@ const ProfileSection = () => {
     );
 }
 
-type TabId = 'profile' | 'categories' | 'users';
+type TabId = 'profile' | 'categories' | 'users' | 'transfer-info';
 
 export const Settings = () => {
     const { isAdmin } = useAuth();
@@ -749,6 +1024,7 @@ export const Settings = () => {
         ? [
             { id: 'categories', label: 'Kategori', icon: 'category' },
             { id: 'users', label: 'Pengguna', icon: 'group' },
+            { id: 'transfer-info', label: 'Info Transfer', icon: 'payments' },
             { id: 'profile', label: 'Akun', icon: 'person' },
         ]
         : [
@@ -765,16 +1041,10 @@ export const Settings = () => {
     }, [isAdmin]);
 
     return (
-        <div className="bg-background-light dark:bg-background-dark font-display min-h-screen flex flex-col transition-colors duration-200 dark">
-            <Navbar />
+        <div className="bg-background-light dark:bg-background-dark font-display flex flex-col transition-colors duration-200 dark">
+
 
             <main className="flex-1 w-full max-w-[1280px] mx-auto px-6 md:px-10 py-8">
-                {/* Page Constants */}
-                <div className="mb-8">
-                    <h1 className="text-gray-900 dark:text-white text-3xl font-black leading-tight tracking-[-0.033em] mb-2">Pengaturan</h1>
-                    <p className="text-gray-500 dark:text-gray-400 text-base font-normal">Kelola preferensi aplikasi dan data master.</p>
-                </div>
-
                 <div className="flex flex-col md:flex-row gap-8">
                     {/* Sidebar Tabs */}
                     <aside className="w-full md:w-64 flex-shrink-0">
@@ -788,7 +1058,7 @@ export const Settings = () => {
                                         : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                                         }`}
                                 >
-                                    <span className="material-symbols-outlined text-[20px]">{tab.icon}</span>
+                                    <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>{tab.icon}</span>
                                     {tab.label}
                                 </button>
                             ))}
@@ -799,22 +1069,13 @@ export const Settings = () => {
                     <div className="flex-1 min-w-0">
                         {activeTab === 'categories' && isAdmin && <KategoriSection />}
                         {activeTab === 'users' && isAdmin && <UsersSection />}
+                        {activeTab === 'transfer-info' && isAdmin && <TransferInfoSection />}
                         {activeTab === 'profile' && <ProfileSection />}
                     </div>
                 </div>
             </main>
 
-            {/* Footer */}
-            <footer className="border-t border-gray-200 dark:border-card-border mt-auto bg-white dark:bg-card-dark py-8">
-                <div className="max-w-[1280px] mx-auto px-6 md:px-10 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">© 2023 AlumniFinance. All rights reserved.</p>
-                    <div className="flex gap-6">
-                        <a className="text-sm text-gray-500 dark:text-gray-400 hover:text-primary transition-colors" href="#">Kebijakan Privasi</a>
-                        <a className="text-sm text-gray-500 dark:text-gray-400 hover:text-primary transition-colors" href="#">Syarat &amp; Ketentuan</a>
-                        <a className="text-sm text-gray-500 dark:text-gray-400 hover:text-primary transition-colors" href="#">Bantuan</a>
-                    </div>
-                </div>
-            </footer>
+
         </div>
     );
 };

@@ -1,13 +1,13 @@
 import { createContext, useContext, ReactNode } from 'react'; // Removed useState, useEffect as we use useSession
 import { User, AuthService } from '../services/auth.service';
 import { useSession } from '../lib/auth-client';
-import { MOCK_USER } from '../services/mockData';
 
 interface AuthContextType {
     user: User | null;
     isLoading: boolean;
     isAuthenticated: boolean;
     isAdmin: boolean;
+    error: any; // Added error field
     login: (email: string, pass: string) => Promise<void>;
     loginWithGoogle: () => Promise<void>;
     logout: () => Promise<void>;
@@ -21,11 +21,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Convert better-auth user to our User interface if necessary, usually it matches
     let user = session?.user as User | null;
     console.log('AuthContext user:', user);
-
-    if (error) {
-        console.warn('Auth error (likely backend down), using mock user');
-        user = MOCK_USER;
-    }
 
     const login = async (email: string, pass: string) => {
         await AuthService.login(email, pass);
@@ -44,7 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const isAdmin = user?.role === 'admin';
 
     return (
-        <AuthContext.Provider value={{ user, isLoading, isAuthenticated, isAdmin, login, loginWithGoogle, logout }}>
+        <AuthContext.Provider value={{ user, isLoading, isAuthenticated, isAdmin, error, login, loginWithGoogle, logout }}>
             {children}
         </AuthContext.Provider>
     );

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useDonationTargets, useCreateDonationTarget, useDeleteDonationTarget } from '../hooks/useDonationTargets';
 import { DonationTarget } from '../services/donation-targets.service';
+import { DonationDetailModal } from './DonationDetailModal';
+
 
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -22,7 +24,40 @@ const iconColors = [
     { iconColor: 'text-teal-600 dark:text-teal-400', iconBgColor: 'bg-teal-100 dark:bg-teal-900/30', progressBarColor: 'bg-teal-500', textColor: 'text-teal-500' },
 ];
 
-const icons = ['campaign', 'school', 'mosque', 'medical_services', 'volunteer_activism', 'biotech'];
+// Available icons for selection
+const availableIcons = [
+    { id: 'campaign', label: 'Kampanye' },
+    { id: 'school', label: 'Pendidikan' },
+    { id: 'mosque', label: 'Masjid' },
+    { id: 'medical_services', label: 'Kesehatan' },
+    { id: 'volunteer_activism', label: 'Sosial' },
+    { id: 'biotech', label: 'Riset' },
+    { id: 'sports_soccer', label: 'Olahraga' },
+    { id: 'nature', label: 'Lingkungan' },
+    { id: 'groups', label: 'Komunitas' },
+    { id: 'child_care', label: 'Anak-anak' },
+    { id: 'home', label: 'Pembangunan' },
+    { id: 'local_library', label: 'Perpustakaan' },
+];
+
+// Get saved icon from localStorage or use default
+const getSavedIcon = (id: string): string => {
+    try {
+        const saved = localStorage.getItem(`donation-icon-${id}`);
+        return saved || availableIcons[getColorIndex(id) % availableIcons.length].id;
+    } catch {
+        return availableIcons[0].id;
+    }
+};
+
+// Save icon to localStorage
+const saveIcon = (id: string, icon: string) => {
+    try {
+        localStorage.setItem(`donation-icon-${id}`, icon);
+    } catch {
+        // Ignore localStorage errors
+    }
+};
 
 const getColorIndex = (id: string) => {
     // Generate a consistent color index based on the id
@@ -41,7 +76,9 @@ export const DonationTargetSection = () => {
     const createMutation = useCreateDonationTarget();
     const deleteMutation = useDeleteDonationTarget();
 
+    const [selectedDonation, setSelectedDonation] = useState<DonationTarget | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedIcon, setSelectedIcon] = useState(availableIcons[0].id);
     const [newDonation, setNewDonation] = useState({
         name: '',
         description: '',
@@ -69,8 +106,13 @@ export const DonationTargetSection = () => {
             description: newDonation.description || undefined,
             targetAmount,
         }, {
-            onSuccess: () => {
+            onSuccess: (createdDonation) => {
+                // Save icon choice to localStorage using the new donation's ID
+                if (createdDonation?.id) {
+                    saveIcon(createdDonation.id, selectedIcon);
+                }
                 setNewDonation({ name: '', description: '', targetAmount: '' });
+                setSelectedIcon(availableIcons[0].id);
                 setIsModalOpen(false);
             },
             onError: (error: any) => {
@@ -112,8 +154,8 @@ export const DonationTargetSection = () => {
                             disabled={!canAddMore}
                             title={!canAddMore ? 'Maksimal 6 target donasi' : 'Tambah target donasi baru'}
                             className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors ${canAddMore
-                                    ? 'bg-primary text-white hover:bg-blue-700'
-                                    : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                                ? 'bg-primary text-white hover:bg-blue-700'
+                                : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                                 }`}
                         >
                             <span className="material-symbols-outlined text-lg">add</span>
@@ -140,22 +182,29 @@ export const DonationTargetSection = () => {
                     {donationList.map((donation: DonationTarget) => {
                         const colorIndex = getColorIndex(donation.id);
                         const colors = iconColors[colorIndex];
-                        const icon = icons[colorIndex];
+                        const icon = getSavedIcon(donation.id);
                         const currentAmount = parseFloat(donation.currentAmount);
                         const targetAmount = parseFloat(donation.targetAmount);
                         const percentage = targetAmount > 0 ? Math.min(100, Math.round((currentAmount / targetAmount) * 100)) : 0;
 
                         return (
-                            <div key={donation.id} className="rounded-xl border border-gray-200 dark:border-card-border bg-white dark:bg-card-dark p-5 shadow-sm hover:shadow-md transition-shadow">
+                            <div
+                                key={donation.id}
+                                className="rounded-xl border border-gray-200 dark:border-card-border bg-white dark:bg-card-dark p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer relative group"
+                                onClick={() => setSelectedDonation(donation)}
+                            >
                                 <div className="flex justify-between items-start mb-4">
                                     <div className={`size-10 rounded-lg ${colors.iconBgColor} flex items-center justify-center ${colors.iconColor}`}>
                                         <span className="material-symbols-outlined">{icon}</span>
                                     </div>
                                     {isAuthenticated && (
                                         <button
-                                            onClick={() => handleDelete(donation.id)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDelete(donation.id);
+                                            }}
                                             disabled={deleteMutation.isPending}
-                                            className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
+                                            className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50 z-10"
                                         >
                                             <span className="material-symbols-outlined text-xl">delete</span>
                                         </button>
@@ -216,6 +265,33 @@ export const DonationTargetSection = () => {
                                     placeholder="Deskripsi singkat target donasi"
                                 />
                             </div>
+
+                            {/* Icon Picker */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Pilih Ikon
+                                </label>
+                                <div className="grid grid-cols-6 gap-2">
+                                    {availableIcons.map((iconOption) => (
+                                        <button
+                                            key={iconOption.id}
+                                            type="button"
+                                            onClick={() => setSelectedIcon(iconOption.id)}
+                                            title={iconOption.label}
+                                            className={`aspect-square rounded-lg flex items-center justify-center transition-all ${selectedIcon === iconOption.id
+                                                ? 'bg-primary text-white ring-2 ring-primary ring-offset-2 dark:ring-offset-card-dark scale-110'
+                                                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                                                }`}
+                                        >
+                                            <span className="material-symbols-outlined text-xl">{iconOption.id}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5 text-center">
+                                    {availableIcons.find(i => i.id === selectedIcon)?.label || 'Pilih ikon'}
+                                </p>
+                            </div>
+
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Target Amount <span className="text-red-500">*</span>
@@ -255,6 +331,14 @@ export const DonationTargetSection = () => {
                     </div>
                 </div>
             )}
+
+            {/* Donation Detail Modal */}
+            <DonationDetailModal
+                isOpen={!!selectedDonation}
+                onClose={() => setSelectedDonation(null)}
+                donationTarget={selectedDonation}
+            />
+
         </section>
     );
 };

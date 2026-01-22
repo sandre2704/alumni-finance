@@ -6,6 +6,9 @@ interface DashboardStats {
     totalBalance: number;
     monthlyIncome: number;
     monthlyExpense: number;
+    totalBalanceTrend: number;
+    monthlyIncomeTrend: number;
+    monthlyExpenseTrend: number;
 }
 
 interface CashFlowData {
@@ -14,6 +17,7 @@ interface CashFlowData {
     income: number;
     expense: number;
     net: number;
+    balance: number;
 }
 
 // Rename ExpenseBreakdown to CategoryBreakdown as they are identical structure, or just duplicate for clarity.
@@ -43,11 +47,16 @@ interface DonationProgress {
     percentage: number;
 }
 
-export const useDashboardStats = () => {
+export const useDashboardStats = (month?: number, year?: number) => {
     return useQuery({
-        queryKey: ['dashboard-stats'],
+        queryKey: ['dashboard-stats', month, year],
         queryFn: async () => {
-            const { data } = await apiClient.get<{ data: DashboardStats }>('/dashboard/stats');
+            const params = new URLSearchParams();
+            if (month) params.append('month', month.toString());
+            if (year) params.append('year', year.toString());
+            const queryString = params.toString() ? `?${params.toString()}` : '';
+
+            const { data } = await apiClient.get<{ data: DashboardStats }>('/dashboard/stats' + queryString);
             return data.data;
         },
     });

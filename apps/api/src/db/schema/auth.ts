@@ -8,8 +8,9 @@ export const user = pgTable("user", {
     image: text("image"),
     createdAt: timestamp("created_at").notNull(),
     updatedAt: timestamp("updated_at").notNull(),
-    role: text("role"),
+    role: text("role").default("guest"),
     username: text("username").unique(),
+    isActive: boolean("is_active").default(true),
     profileCompleted: boolean("profile_completed").default(false),
 });
 

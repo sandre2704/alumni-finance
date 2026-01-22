@@ -5,13 +5,15 @@
  * with known credentials via the better-auth API.
  */
 
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'http://localhost:3001';
 
 // Test user credentials - used in all login tests
+// Note: Using admin credentials that support both username and email login
 export const TEST_USER = {
-    email: 'e2etest@alumni.com',
-    password: 'TestPassword123!',
-    name: 'E2E Test User',
+    username: 'admin',
+    email: 'admin@alumni.com',
+    password: 'Sandre123',
+    name: 'Admin User',
 };
 
 async function globalSetup() {
@@ -23,6 +25,7 @@ async function globalSetup() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Origin': 'http://localhost:5173',
             },
             body: JSON.stringify({
                 email: TEST_USER.email,

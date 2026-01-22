@@ -77,7 +77,8 @@ export const TransactionTable = () => {
                     </div>
                 </div>
             </div>
-            <div className="overflow-x-auto">
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-gray-50 dark:bg-background-dark/50 border-b border-gray-200 dark:border-card-border">
@@ -121,6 +122,41 @@ export const TransactionTable = () => {
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden flex flex-col divide-y divide-gray-200 dark:divide-card-border">
+                {filteredTransactions.length > 0 ? filteredTransactions.map((t) => (
+                    <div key={t.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                        <div className="flex items-start justify-between mb-2">
+                            <div className="flex flex-col">
+                                <span className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{formatDate(t.transactionDate)}</span>
+                                <span className="font-semibold text-gray-900 dark:text-white line-clamp-1">
+                                    {t.type === 'income' ? (t.donorName || '-') : (t.description || '-')}
+                                </span>
+                                <span className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
+                                    {t.type === 'income' ? (t.description || '-') : '-'}
+                                </span>
+                            </div>
+                            <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide ${t.type === 'income' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'}`}>
+                                {t.type === 'income' ? 'Masuk' : 'Keluar'}
+                            </span>
+                        </div>
+                        <div className="flex items-center justify-between mt-3">
+                            <div className="flex items-center gap-1.5">
+                                <span className="material-symbols-outlined text-[16px] text-gray-400">category</span>
+                                <span className="text-xs text-gray-600 dark:text-gray-300">{getCategoryName(t.categoryId)}</span>
+                            </div>
+                            <span className={`font-bold text-sm ${t.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-white'}`}>
+                                {t.type === 'income' ? '+' : '-'} {formatCurrency(t.amount)}
+                            </span>
+                        </div>
+                    </div>
+                )) : (
+                    <div className="p-8 text-center text-gray-500 dark:text-gray-400 text-sm">
+                        {searchTerm ? 'Tidak ditemukan transaksi yang cocok.' : 'Belum ada transaksi.'}
+                    </div>
+                )}
             </div>
             <div className="p-4 border-t border-gray-200 dark:border-card-border flex justify-center">
                 <Link to="/transactions" className="text-primary text-sm font-semibold hover:underline">Lihat Semua Transaksi</Link>

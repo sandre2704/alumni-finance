@@ -6,7 +6,9 @@ const router = Router();
 // Get summary stats (balance, income, expense)
 router.get('/stats', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const stats = await dashboardService.getStats();
+        const month = req.query.month ? parseInt(req.query.month as string) : undefined;
+        const year = req.query.year ? parseInt(req.query.year as string) : undefined;
+        const stats = await dashboardService.getStats(month, year);
 
         res.json({
             success: true,

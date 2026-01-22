@@ -136,16 +136,41 @@ class ProfileService {
 
     /**
      * Get email by username (for login with username)
+     * Also returns isActive status for pre-login validation
      */
-    async getEmailByUsername(username: string): Promise<string | null> {
+    async getEmailByUsername(username: string): Promise<{ email: string; isActive: boolean } | null> {
         const user = await db.query.user.findFirst({
             where: eq(users.username, username),
             columns: {
                 email: true,
+                isActive: true,
             },
         });
 
-        return user?.email || null;
+        if (!user?.email) return null;
+
+        return {
+            email: user.email,
+            isActive: user.isActive ?? true
+        };
+    }
+
+    /**
+     * Check user active status by email (for pre-login validation)
+     */
+    async getUserStatusByEmail(email: string): Promise<{ isActive: boolean } | null> {
+        const user = await db.query.user.findFirst({
+            where: eq(users.email, email),
+            columns: {
+                isActive: true,
+            },
+        });
+
+        if (!user) return null;
+
+        return {
+            isActive: user.isActive ?? true
+        };
     }
     /**
      * Change user password

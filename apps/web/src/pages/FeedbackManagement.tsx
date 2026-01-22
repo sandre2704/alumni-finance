@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navbar } from '../components/Navbar';
+
 import {
     FEEDBACK_CATEGORY_LABELS,
     FEEDBACK_STATUS_LABELS,
@@ -89,8 +89,8 @@ export const FeedbackManagement = () => {
     };
 
     return (
-        <div className="bg-background-light dark:bg-background-dark font-display min-h-screen flex flex-col transition-colors duration-200 dark">
-            <Navbar />
+        <div className="bg-background-light dark:bg-background-dark font-display flex flex-col transition-colors duration-200 dark">
+
 
             <main className="flex-1 w-full max-w-[1280px] mx-auto px-6 md:px-10 py-8">
                 {/* Page Header */}
@@ -325,17 +325,7 @@ export const FeedbackManagement = () => {
                 </div>
             </main>
 
-            {/* Footer */}
-            <footer className="border-t border-gray-200 dark:border-card-border mt-auto bg-white dark:bg-card-dark py-8">
-                <div className="max-w-[1280px] mx-auto px-6 md:px-10 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">© 2023 AlumniFinance. All rights reserved.</p>
-                    <div className="flex gap-6">
-                        <a className="text-sm text-gray-500 dark:text-gray-400 hover:text-primary transition-colors" href="#">Kebijakan Privasi</a>
-                        <a className="text-sm text-gray-500 dark:text-gray-400 hover:text-primary transition-colors" href="#">Syarat &amp; Ketentuan</a>
-                        <a className="text-sm text-gray-500 dark:text-gray-400 hover:text-primary transition-colors" href="#">Bantuan</a>
-                    </div>
-                </div>
-            </footer>
+
         </div>
     );
 };

@@ -9,15 +9,7 @@ class UserService {
     async getNonAdminUsers() {
         const userList = await db.query.user.findMany({
             where: ne(users.role, 'admin'),
-            columns: {
-                id: true,
-                username: true,
-                email: true,
-                name: true,
-                role: true,
-                createdAt: true,
-                updatedAt: true,
-            },
+            orderBy: (users, { desc }) => [desc(users.createdAt)],
         });
         return userList;
     }
@@ -47,7 +39,11 @@ class UserService {
                     email: data.email,
                     password: data.password,
                     name: data.name,
-                }
+                    role: 'guest',
+                    username: data.username,
+                    isActive: true,
+                    profileCompleted: false
+                } as any
             });
 
             if (!result) {
@@ -76,7 +72,7 @@ class UserService {
         }
     }
 
-    async update(id: string, data: { username?: string; email?: string; name?: string; password?: string }) {
+    async update(id: string, data: { username?: string; email?: string; name?: string; password?: string, isActive?: boolean, role?: string }) {
         const existingUser = await db.query.user.findFirst({
             where: eq(users.id, id),
         });
@@ -117,6 +113,8 @@ class UserService {
         if (data.username) updateData.username = data.username;
         if (data.email) updateData.email = data.email;
         if (data.name) updateData.name = data.name;
+        if (data.isActive !== undefined) updateData.isActive = data.isActive;
+        if (data.role) updateData.role = data.role;
 
         // Password update is complex with better-auth manual update, skipping for now or use auth.api if possible
         // For now preventing password update via this endpoint or needs specific handling
@@ -134,6 +132,7 @@ class UserService {
                 email: users.email,
                 name: users.name,
                 role: users.role,
+                isActive: users.isActive,
                 createdAt: users.createdAt,
                 updatedAt: users.updatedAt,
             });

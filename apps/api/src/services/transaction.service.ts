@@ -131,7 +131,10 @@ class TransactionService {
                 categoryId = donasiCategory.id;
             } else {
                 // Create Donasi category if not exists
+                // Note: categories.id is text without auto-generation, so we need to provide one
+                const newId = crypto.randomUUID();
                 const [newCat] = await db.insert(categories).values({
+                    id: newId,
                     name: 'Donasi',
                     slug: 'donasi',
                     type: 'income',

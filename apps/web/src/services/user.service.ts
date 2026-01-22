@@ -6,6 +6,7 @@ export interface User {
     email: string;
     name: string;
     role: string;
+    isActive: boolean;
     createdAt: string;
     updatedAt: string;
 }
@@ -15,6 +16,7 @@ export interface CreateUserData {
     email: string;
     name: string;
     password: string;
+    isActive?: boolean;
 }
 
 export interface UpdateUserData {
@@ -22,6 +24,8 @@ export interface UpdateUserData {
     email?: string;
     name?: string;
     password?: string;
+    isActive?: boolean;
+    role?: string;
 }
 
 export const UserService = {

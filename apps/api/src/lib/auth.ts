@@ -4,6 +4,7 @@ import { db } from "../db/index";
 import { account, session, user, verification } from "../db/schema/auth";
 import { env } from "../config/env";
 import { emailService } from "../services/email.service";
+import { eq } from "drizzle-orm";
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
@@ -23,14 +24,41 @@ export const auth = betterAuth({
             username: {
                 type: "string",
             },
+            isActive: {
+                type: "boolean",
+                required: false,
+                defaultValue: true
+            },
             profileCompleted: {
                 type: "boolean",
             }
         }
     },
+    databaseHooks: {
+        session: {
+            create: {
+                before: async (session) => {
+                    // Use db.select to avoid db.query type issues
+                    const [foundUser] = await db.select({ isActive: user.isActive })
+                        .from(user)
+                        .where(eq(user.id, session.userId));
+
+                    if (foundUser && foundUser.isActive === false) {
+                        // Throwing error to prevent session creation
+                        throw new Error("Akun Anda dinonaktifkan. Hubungi admin.");
+                    }
+                    return {
+                        data: {
+                            ...session
+                        }
+                    };
+                }
+            }
+        }
+    },
     emailAndPassword: {
         enabled: true,
-        requireEmailVerification: true, // Enabled - users must verify email
+        requireEmailVerification: true,
         sendResetPassword: async ({ user, url, token }) => {
             await emailService.sendPasswordResetEmail(user.email, url, user.name, token);
         },
@@ -41,7 +69,6 @@ export const auth = betterAuth({
         },
         sendOnSignUp: true,
         autoSignInAfterVerification: true,
-        callbackURL: "http://localhost:5173/verify-email?verified=true",
     },
     socialProviders: {
         google: {
@@ -52,4 +79,17 @@ export const auth = betterAuth({
     trustedOrigins: ["http://localhost:5173", "http://localhost:3000"],
     baseURL: env.BETTER_AUTH_URL,
     debug: true,
+    callbacks: {
+        session: async ({ session, user }: { session: any, user: any }) => {
+            return {
+                ...session,
+                user: {
+                    ...session.user,
+                    role: user.role,
+                    username: user.username,
+                    name: user.name
+                }
+            }
+        }
+    },
 });

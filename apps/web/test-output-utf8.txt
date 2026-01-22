@@ -1,0 +1,61 @@
+﻿­ƒöº Global Setup: Creating test user via API...
+Ô£à Test user created successfully
+­ƒöº Global Setup completed
+
+Running 1 test using 1 worker
+
+[1A[2K[1/1] [chromium] ÔÇ║ e2e\transaction.spec.ts:103:3 ÔÇ║ E2E Login dan Input 10 Transaksi dalam 1 Sesi ÔÇ║ Login sekali dan input 10 transaksi secara berurutan
+[1A[2K[chromium] ÔÇ║ e2e\transaction.spec.ts:103:3 ÔÇ║ E2E Login dan Input 10 Transaksi dalam 1 Sesi ÔÇ║ Login sekali dan input 10 transaksi secara berurutan
+­ƒôì Login ke aplikasi...
+
+[1A[2KÔ£à Login berhasil!
+
+
+[1A[2K­ƒôï Navigasi ke halaman Transaksi...
+
+[1A[2KÔ£à Berhasil masuk halaman Transaksi!
+
+
+[1A[2K
+­ƒöä [1/10] 1. Pemasukan biasa dengan kategori Iuran Wajib
+
+[1A[2KÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+[1A[2K   ­ƒôØ Modal terbuka
+
+[1A[2K   ­ƒæñ Nama: Alumni Test 1
+
+[1A[2K   ­ƒôé Kategori dipilih
+
+[1A[2K  1) [chromium] ÔÇ║ e2e\transaction.spec.ts:103:3 ÔÇ║ E2E Login dan Input 10 Transaksi dalam 1 Sesi ÔÇ║ Login sekali dan input 10 transaksi secara berurutan 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('input[type="number"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('input[type="number"]')[22m
+
+
+      229 |             // Input jumlah
+      230 |             const amountInput = page.locator('input[type="number"]');
+    > 231 |             await expect(amountInput).toBeVisible({ timeout: 5000 });
+          |                                       ^
+      232 |             await amountInput.fill(tc.amount);
+      233 |             console.log(`   ­ƒÆÁ Jumlah: Rp ${parseInt(tc.amount).toLocaleString('id-ID')}`);
+      234 |
+        at D:\Bootcamp\Antigravity\alumni-finance\apps\web\e2e\transaction.spec.ts:231:39
+
+    attachment #1: screenshot (image/png) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    test-results\transaction-E2E-Login-dan--b8215--transaksi-secara-berurutan-chromium\test-failed-1.png
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error Context: test-results\transaction-E2E-Login-dan--b8215--transaksi-secara-berurutan-chromium\error-context.md
+
+
+[1A[2K  1 failed
+    [chromium] ÔÇ║ e2e\transaction.spec.ts:103:3 ÔÇ║ E2E Login dan Input 10 Transaksi dalam 1 Sesi ÔÇ║ Login sekali dan input 10 transaksi secara berurutan 

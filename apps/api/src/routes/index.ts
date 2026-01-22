@@ -7,6 +7,7 @@ import reportsRoutes from './reports.routes';
 import donationTargetsRoutes from './donation-targets.routes';
 import usersRoutes from './users.routes';
 import profileRoutes from './profile.routes';
+import siteSettingsRoutes from './site-settings.routes';
 
 import uploadRoutes from './upload.routes';
 
@@ -26,4 +27,5 @@ router.use('/upload', uploadRoutes);
 router.use('/export', exportRouter);
 router.use('/profile', profileRoutes);
 router.use('/feedbacks', feedbackRoutes);
+router.use('/site-settings', siteSettingsRoutes);
 

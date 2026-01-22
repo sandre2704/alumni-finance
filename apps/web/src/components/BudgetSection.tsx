@@ -1,8 +1,8 @@
-
-
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useBudgetStatus } from '../hooks/useDashboard';
+import { useBudgetStatus, BudgetStatus } from '../hooks/useDashboard';
 import { useAuth } from '../hooks/useAuth';
+import { BudgetDetailModal } from './BudgetDetailModal';
 
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -17,6 +17,18 @@ export const BudgetSection = () => {
     const navigate = useNavigate();
     const { data: budgets, isLoading } = useBudgetStatus();
     const { isAdmin } = useAuth();
+    const [selectedBudget, setSelectedBudget] = useState<BudgetStatus | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleCardClick = (budget: BudgetStatus) => {
+        setSelectedBudget(budget);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedBudget(null);
+    };
 
     if (isLoading) return <div className="text-center py-4 text-gray-400">Loading budget data...</div>;
 
@@ -52,7 +64,11 @@ export const BudgetSection = () => {
                     const isOverBudget = item.actual > item.budget;
 
                     return (
-                        <div key={item.id} className="bg-white dark:bg-card-dark border border-gray-200 dark:border-card-border p-5 rounded-xl shadow-sm">
+                        <div
+                            key={item.id}
+                            className="bg-white dark:bg-card-dark border border-gray-200 dark:border-card-border p-5 rounded-xl shadow-sm cursor-pointer hover:shadow-md hover:border-primary/50 transition-all"
+                            onClick={() => handleCardClick(item)}
+                        >
                             <div className="flex justify-between items-start mb-2">
                                 <h4 className="font-bold text-gray-900 dark:text-white">{item.category}</h4>
                                 <span className={`text-xs font-bold px-2 py-0.5 rounded ${isOverBudget ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
@@ -76,6 +92,12 @@ export const BudgetSection = () => {
                     );
                 })}
             </div>
+
+            <BudgetDetailModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                budget={selectedBudget}
+            />
         </section>
     );
 };

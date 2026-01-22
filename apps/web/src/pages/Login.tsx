@@ -30,8 +30,20 @@ export const Login = () => {
         try {
             await login(email, password);
             navigate('/');
-        } catch (err) {
-            setError('Email/username atau password salah');
+        } catch (err: any) {
+            // Extract error message
+            const errorMessage = err?.message || '';
+
+            // Check for inactive account error
+            if (errorMessage === 'ACCOUNT_INACTIVE' ||
+                errorMessage.includes('dinonaktifkan') ||
+                errorMessage.includes('tidak aktif')) {
+                setError('Akun Anda tidak aktif. Silakan hubungi administrator.');
+            } else if (errorMessage.includes('tidak ditemukan')) {
+                setError(errorMessage);
+            } else {
+                setError('Email/username atau password salah');
+            }
         }
     };
 

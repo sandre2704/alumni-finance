@@ -47,4 +47,14 @@ export const DonationTargetsService = {
     delete: async (id: string) => {
         await apiClient.delete(`/donation-targets/${id}`);
     },
+
+    getDonors: async (id: string, params?: any) => {
+        const queryParams = new URLSearchParams(params).toString();
+        const { data } = await apiClient.get<{
+            data: any[],
+            meta: { page: number, limit: number, total: number, totalPages: number },
+            stats: { totalCollected: number, donorCount: number }
+        }>(`/donation-targets/${id}/donors?${queryParams}`);
+        return data;
+    },
 };

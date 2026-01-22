@@ -86,11 +86,30 @@ router.get('/check-username/:username', async (req: Request, res: Response, next
 router.get('/get-email-by-username/:username', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { username } = req.params;
-        const email = await profileService.getEmailByUsername(username);
-        if (email) {
-            res.json({ email });
+        const result = await profileService.getEmailByUsername(username);
+        if (result) {
+            res.json({ email: result.email, isActive: result.isActive });
         } else {
             res.status(404).json({ error: 'Username tidak ditemukan' });
+        }
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
+ * GET /api/profile/get-user-status-by-email/:email
+ * Get user active status by email (for pre-login validation)
+ */
+router.get('/get-user-status-by-email/:email', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { email } = req.params;
+        const result = await profileService.getUserStatusByEmail(email);
+        if (result) {
+            res.json({ isActive: result.isActive });
+        } else {
+            // Return true if user not found (let better-auth handle the actual auth)
+            res.json({ isActive: true });
         }
     } catch (error) {
         next(error);

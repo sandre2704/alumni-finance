@@ -14,6 +14,7 @@ export interface User {
 export const AuthService = {
     login: async (emailOrUsername: string, password: string) => {
         let email = emailOrUsername;
+        let isActive = true;
 
         // Check if input is not an email (doesn't contain @)
         if (!emailOrUsername.includes('@')) {
@@ -25,12 +26,30 @@ export const AuthService = {
                 const data = await response.json();
                 if (data.email) {
                     email = data.email;
+                    isActive = data.isActive !== false; // Default to true if not present
                 } else {
                     throw new Error('Username tidak ditemukan');
                 }
             } catch (err) {
                 throw new Error('Username tidak ditemukan');
             }
+        } else {
+            // It's an email, check user status directly
+            try {
+                const response = await fetch(`${API_URL}/api/profile/get-user-status-by-email/${encodeURIComponent(emailOrUsername)}`, {
+                    credentials: 'include',
+                });
+                const data = await response.json();
+                isActive = data.isActive !== false;
+            } catch (err) {
+                // If error checking status, let better-auth handle it
+                isActive = true;
+            }
+        }
+
+        // Check if account is active before attempting login
+        if (!isActive) {
+            throw new Error('ACCOUNT_INACTIVE');
         }
 
         const { data, error } = await signIn.email({

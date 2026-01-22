@@ -47,6 +47,22 @@ router.get('/active', async (req: Request, res: Response, next: NextFunction) =>
     }
 });
 
+// Get donation target donors
+router.get('/:id/donors', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const result = await donationTargetService.getDonors(req.params.id, req.query);
+
+        res.json({
+            success: true,
+            data: result.data,
+            meta: result.meta,
+            stats: result.stats
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
 // Get single donation target
 router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {

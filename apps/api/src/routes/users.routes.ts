@@ -27,6 +27,8 @@ const updateUserSchema = z.object({
     email: z.string().email('Format email tidak valid').optional(),
     name: z.string().min(1, 'Nama tidak boleh kosong').optional(),
     password: z.string().min(6, 'Password minimal 6 karakter').optional(),
+    isActive: z.boolean().optional(),
+    role: z.string().optional(),
 });
 
 // Get all non-admin users (admin only)

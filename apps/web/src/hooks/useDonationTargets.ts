@@ -50,3 +50,10 @@ export const useDeleteDonationTarget = () => {
         },
     });
 };
+export const useDonationDonors = (id: string, params?: any) => {
+    return useQuery({
+        queryKey: ['donation-donors', id, params],
+        queryFn: () => DonationTargetsService.getDonors(id, params),
+        enabled: !!id,
+    });
+};

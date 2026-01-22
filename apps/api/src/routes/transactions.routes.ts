@@ -51,7 +51,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 // Get single transaction
 router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const transaction = await transactionService.getById(req.params.id);
+        const transaction = await transactionService.getById(req.params.id as string);
 
         res.json({
             success: true,
@@ -104,7 +104,7 @@ router.put('/:id', authMiddleware, async (req: Request, res: Response, next: Nex
             throw new AppError(400, 'Invalid transaction data');
         }
 
-        const transaction = await transactionService.update(req.params.id, validation.data);
+        const transaction = await transactionService.update(req.params.id as string, validation.data);
 
         res.json({
             success: true,
@@ -118,7 +118,7 @@ router.put('/:id', authMiddleware, async (req: Request, res: Response, next: Nex
 // Delete transaction
 router.delete('/:id', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await transactionService.delete(req.params.id);
+        await transactionService.delete(req.params.id as string);
 
         res.json({
             success: true,
@@ -136,7 +136,7 @@ router.post('/:id/receipt', authMiddleware, async (req: Request, res: Response, 
         // For now, just accept a URL
         const { receiptUrl } = req.body;
 
-        const transaction = await transactionService.updateReceipt(req.params.id, receiptUrl);
+        const transaction = await transactionService.updateReceipt(req.params.id as string, receiptUrl);
 
         res.json({
             success: true,

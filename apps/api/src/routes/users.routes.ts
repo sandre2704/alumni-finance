@@ -47,7 +47,7 @@ router.get('/', authMiddleware, adminOnly, async (req: Request, res: Response, n
 // Get user by ID (admin only)
 router.get('/:id', authMiddleware, adminOnly, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await userService.getById(req.params.id);
+        const user = await userService.getById(req.params.id as string);
         if (!user) {
             throw new AppError(404, 'User tidak ditemukan');
         }
@@ -88,7 +88,7 @@ router.put('/:id', authMiddleware, adminOnly, async (req: Request, res: Response
             throw new AppError(400, errorMessage);
         }
 
-        const user = await userService.update(req.params.id, validation.data);
+        const user = await userService.update(req.params.id as string, validation.data);
         res.json({
             success: true,
             data: user,
@@ -101,7 +101,7 @@ router.put('/:id', authMiddleware, adminOnly, async (req: Request, res: Response
 // Delete user (admin only)
 router.delete('/:id', authMiddleware, adminOnly, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await userService.delete(req.params.id);
+        await userService.delete(req.params.id as string);
         res.json({
             success: true,
             message: 'User berhasil dihapus',

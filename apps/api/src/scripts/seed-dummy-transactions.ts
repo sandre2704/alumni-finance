@@ -1,6 +1,6 @@
 import { db } from '../db/index.js';
 import { transactions } from '../db/schema/transactions.js';
-import { users } from '../db/schema/users.js';
+import { user } from '../db/schema/index.js';
 import { categories } from '../db/schema/categories.js';
 import { eq } from 'drizzle-orm';
 
@@ -8,8 +8,8 @@ async function seedDummyTransactions() {
     console.log('🚀 Starting dummy transaction injection...');
 
     // 1. Get Admin User
-    const admin = await db.query.users.findFirst({
-        where: eq(users.username, 'admin')
+    const admin = await db.query.user.findFirst({
+        where: eq(user.username, 'admin')
     });
 
     if (!admin) {

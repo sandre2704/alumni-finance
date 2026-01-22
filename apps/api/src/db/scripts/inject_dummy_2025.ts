@@ -1,6 +1,6 @@
 import { db } from '../index.js';
 import { categories } from '../schema/categories.js';
-import { users } from '../schema/users.js';
+import { user } from '../schema/index.js';
 import { transactions } from '../schema/transactions.js';
 import { eq } from 'drizzle-orm';
 
@@ -17,8 +17,8 @@ async function injectData() {
     }
 
     // 2. Get Admin User for createdBy
-    const admin = await db.query.users.findFirst({
-        where: eq(users.role, 'admin')
+    const admin = await db.query.user.findFirst({
+        where: eq(user.role, 'admin')
     });
 
     if (!admin) {

@@ -68,7 +68,7 @@ router.put('/:id/status', authMiddleware, adminOnly, async (req: Request, res: R
             throw new AppError(400, 'Status tidak valid');
         }
 
-        const feedback = await feedbackService.updateStatus(req.params.id, status);
+        const feedback = await feedbackService.updateStatus(req.params.id as string, status);
         res.json({
             success: true,
             data: feedback,
@@ -81,7 +81,7 @@ router.put('/:id/status', authMiddleware, adminOnly, async (req: Request, res: R
 // Mark as read (Admin only)
 router.put('/:id/read', authMiddleware, adminOnly, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const feedback = await feedbackService.markAsRead(req.params.id);
+        const feedback = await feedbackService.markAsRead(req.params.id as string);
         res.json({
             success: true,
             data: feedback,

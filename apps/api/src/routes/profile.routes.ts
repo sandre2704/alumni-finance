@@ -72,7 +72,7 @@ router.get('/status', getCurrentUser, async (req: Request, res: Response, next: 
 router.get('/check-username/:username', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { username } = req.params;
-        const available = await profileService.checkUsernameAvailable(username);
+        const available = await profileService.checkUsernameAvailable(username as string);
         res.json({ available });
     } catch (error) {
         next(error);
@@ -86,7 +86,7 @@ router.get('/check-username/:username', async (req: Request, res: Response, next
 router.get('/get-email-by-username/:username', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { username } = req.params;
-        const result = await profileService.getEmailByUsername(username);
+        const result = await profileService.getEmailByUsername(username as string);
         if (result) {
             res.json({ email: result.email, isActive: result.isActive });
         } else {
@@ -104,7 +104,7 @@ router.get('/get-email-by-username/:username', async (req: Request, res: Respons
 router.get('/get-user-status-by-email/:email', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email } = req.params;
-        const result = await profileService.getUserStatusByEmail(email);
+        const result = await profileService.getUserStatusByEmail(email as string);
         if (result) {
             res.json({ isActive: result.isActive });
         } else {

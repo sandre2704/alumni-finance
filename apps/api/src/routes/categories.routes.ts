@@ -44,7 +44,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
 router.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { name, type, monthlyBudget } = req.body;
-        const category = await categoryService.update(req.params.id, { name, type, monthlyBudget });
+        const category = await categoryService.update(req.params.id as string, { name, type, monthlyBudget });
 
         res.json({
             success: true,
@@ -58,7 +58,7 @@ router.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
 // Delete category
 router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await categoryService.delete(req.params.id);
+        await categoryService.delete(req.params.id as string);
 
         res.json({
             success: true,
@@ -72,7 +72,7 @@ router.delete('/:id', async (req: Request, res: Response, next: NextFunction) =>
 // Get category by ID
 router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const category = await categoryService.getById(req.params.id);
+        const category = await categoryService.getById(req.params.id as string);
 
         res.json({
             success: true,

@@ -111,7 +111,7 @@ class DonationTargetService {
                 or(
                     ilike(transactions.donorName, `%${search}%`),
                     ilike(transactions.description, `%${search}%`)
-                )
+                ) as SQL<unknown>
             );
         }
 

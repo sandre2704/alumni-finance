@@ -10,7 +10,9 @@ import { router } from './routes/index.js';
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
 
-export const app = express();
+import type { Express } from 'express';
+
+export const app: Express = express();
 
 // Security middleware
 app.use(helmet({

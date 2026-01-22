@@ -20,7 +20,7 @@ async function main() {
                 ID: t.id.substring(0, 8) + '...',
                 Date: new Date(t.transactionDate).toLocaleDateString('id-ID'),
                 Type: t.type,
-                Category: categoryMap.get(t.categoryId) || '-',
+                Category: categoryMap.get(t.categoryId || '') || '-',
                 Amount: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(Number(t.amount)),
                 Name: t.donorName || t.description || '-'
             })));

@@ -50,7 +50,7 @@ router.get('/active', async (req: Request, res: Response, next: NextFunction) =>
 // Get donation target donors
 router.get('/:id/donors', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const result = await donationTargetService.getDonors(req.params.id, req.query);
+        const result = await donationTargetService.getDonors(req.params.id as string, req.query);
 
         res.json({
             success: true,
@@ -66,7 +66,7 @@ router.get('/:id/donors', async (req: Request, res: Response, next: NextFunction
 // Get single donation target
 router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const target = await donationTargetService.getById(req.params.id);
+        const target = await donationTargetService.getById(req.params.id as string);
 
         res.json({
             success: true,
@@ -104,7 +104,7 @@ router.put('/:id', authMiddleware, async (req: Request, res: Response, next: Nex
             throw new AppError(400, 'Invalid donation target data');
         }
 
-        const target = await donationTargetService.update(req.params.id, validation.data);
+        const target = await donationTargetService.update(req.params.id as string, validation.data);
 
         res.json({
             success: true,
@@ -118,7 +118,7 @@ router.put('/:id', authMiddleware, async (req: Request, res: Response, next: Nex
 // Delete donation target
 router.delete('/:id', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await donationTargetService.delete(req.params.id);
+        await donationTargetService.delete(req.params.id as string);
 
         res.json({
             success: true,

@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { categoryService } from '../services/category.service';
 
-const router = Router();
+const router: Router = Router();
 
 // Get all categories
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {

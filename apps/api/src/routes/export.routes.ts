@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { ExportService } from '../services/export.service.js';
 import { z } from 'zod';
 
-export const exportRouter = Router();
+export const exportRouter: Router = Router();
 
 export const dateRangeSchema = z.object({
     startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),

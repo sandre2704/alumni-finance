@@ -3,7 +3,7 @@ import { profileService } from '../services/profile.service.js';
 import { auth } from '../lib/auth.js';
 import { fromNodeHeaders } from 'better-auth/node';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * Middleware to get current user from session

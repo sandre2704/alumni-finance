@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { AppError } from '../middleware/error-handler.js';
 import { authMiddleware } from '../middleware/auth.js';
 
-const router = Router();
+const router: Router = Router();
 
 const createTargetSchema = z.object({
     name: z.string().min(1),

@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { AppError } from '../middleware/error-handler';
 import { authMiddleware } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 
 const createTransactionSchema = z.object({
     type: z.enum(['income', 'expense']),

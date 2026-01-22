@@ -4,7 +4,7 @@ import { authMiddleware } from '../middleware/auth';
 import { auth } from '../lib/auth';
 import { fromNodeHeaders } from 'better-auth/node';
 
-const router = Router();
+const router: Router = Router();
 
 // GET /api/site-settings/transfer-info - Public endpoint
 router.get('/transfer-info', async (req: Request, res: Response, next: NextFunction) => {

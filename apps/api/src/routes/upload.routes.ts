@@ -4,7 +4,7 @@ import { uploadService } from '../services/upload.service';
 import { AppError } from '../middleware/error-handler';
 import { authMiddleware } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 
 console.log('Registering Upload Routes...');
 

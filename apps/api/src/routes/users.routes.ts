@@ -4,7 +4,7 @@ import { authMiddleware } from '../middleware/auth.js';
 import { AppError } from '../middleware/error-handler.js';
 import { z } from 'zod';
 
-const router = Router();
+const router: Router = Router();
 
 // Middleware to check if user is admin
 const adminOnly = (req: Request, res: Response, next: NextFunction) => {

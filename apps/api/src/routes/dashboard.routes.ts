@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { dashboardService } from '../services/dashboard.service.js';
 
-const router = Router();
+const router: Router = Router();
 
 // Get summary stats (balance, income, expense)
 router.get('/stats', async (req: Request, res: Response, next: NextFunction) => {

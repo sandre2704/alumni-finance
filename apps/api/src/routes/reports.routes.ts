@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { reportService } from '../services/report.service.js';
 import { z } from 'zod';
 
-const router = Router();
+const router: Router = Router();
 console.log('📊 Reports routes loaded - daily-cashflow should be available');
 
 const dateRangeSchema = z.object({

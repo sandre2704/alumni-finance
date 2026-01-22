@@ -14,7 +14,7 @@ import uploadRoutes from './upload.routes';
 import { exportRouter } from './export.routes';
 import feedbackRoutes from './feedbacks.routes';
 
-export const router = Router();
+export const router: Router = Router();
 
 // router.use('/auth', authRoutes);
 router.use('/categories', categoriesRoutes);

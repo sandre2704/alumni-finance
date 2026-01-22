@@ -2,7 +2,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import streamifier from 'streamifier';
 import fs from 'fs';
 import path from 'path';
-import { env } from '../config/env';
+import { env } from '../config/env.js';
 
 // Configure Cloudinary
 cloudinary.config({

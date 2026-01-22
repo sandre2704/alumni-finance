@@ -1,6 +1,6 @@
 
-import { db } from '../db';
-import { transactions } from '../db/schema/transactions';
+import { db } from '../db/index.js';
+import { transactions } from '../db/schema/transactions.js';
 import { lte } from 'drizzle-orm';
 
 async function main() {

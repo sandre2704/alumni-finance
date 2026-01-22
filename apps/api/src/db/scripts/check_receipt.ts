@@ -1,5 +1,5 @@
-import { db } from '../index';
-import { transactions } from '../schema/transactions';
+import { db } from '../index.js';
+import { transactions } from '../schema/transactions.js';
 import { desc } from 'drizzle-orm';
 
 async function checkLatestTransaction() {

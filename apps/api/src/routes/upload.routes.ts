@@ -1,8 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
-import { uploadService } from '../services/upload.service';
-import { AppError } from '../middleware/error-handler';
-import { authMiddleware } from '../middleware/auth';
+import { uploadService } from '../services/upload.service.js';
+import { AppError } from '../middleware/error-handler.js';
+import { authMiddleware } from '../middleware/auth.js';
 
 const router: Router = Router();
 

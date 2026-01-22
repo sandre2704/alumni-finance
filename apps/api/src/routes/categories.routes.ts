@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { categoryService } from '../services/category.service';
+import { categoryService } from '../services/category.service.js';
 
 const router: Router = Router();
 

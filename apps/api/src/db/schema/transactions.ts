@@ -1,7 +1,7 @@
 import { pgTable, uuid, varchar, text, timestamp, decimal, boolean, date, pgEnum } from 'drizzle-orm/pg-core';
-import { user } from './auth';
-import { categories } from './categories';
-import { donationTargets } from './donation-targets';
+import { user } from './auth.js';
+import { categories } from './categories.js';
+import { donationTargets } from './donation-targets.js';
 
 export const transactionTypeEnum = pgEnum('transaction_type', ['income', 'expense']);
 export const transactionStatusEnum = pgEnum('transaction_status', ['paid', 'processing']);

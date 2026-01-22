@@ -1,5 +1,5 @@
 
-import { db } from '../db';
+import { db } from '../db/index.js';
 
 async function main() {
     console.log('Fetching transactions from database...');

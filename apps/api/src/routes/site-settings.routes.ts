@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { SiteSettingsService } from '../services/site-settings.service';
-import { authMiddleware } from '../middleware/auth';
-import { auth } from '../lib/auth';
+import { SiteSettingsService } from '../services/site-settings.service.js';
+import { authMiddleware } from '../middleware/auth.js';
+import { auth } from '../lib/auth.js';
 import { fromNodeHeaders } from 'better-auth/node';
 
 const router: Router = Router();

@@ -1,9 +1,9 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "../db/index";
-import { account, session, user, verification } from "../db/schema/auth";
-import { env } from "../config/env";
-import { emailService } from "../services/email.service";
+import { db } from "../db/index.js";
+import { user, session, account, verification } from "../db/schema/auth.js";
+import { env } from "../config/env.js";
+import { emailService } from "../services/email.service.js";
 import { eq } from "drizzle-orm";
 
 export const auth = betterAuth({

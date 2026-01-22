@@ -1,7 +1,7 @@
 
-import { auth } from "../lib/auth";
-import { db } from "../db/index";
-import { user, account } from "../db/schema/auth";
+import { auth } from "../lib/auth.js";
+import { db } from "../db/index.js";
+import { user, account } from "../db/schema/auth.js";
 import { eq, and } from "drizzle-orm";
 
 async function main() {

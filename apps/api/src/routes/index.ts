@@ -1,18 +1,18 @@
 import { Router } from 'express';
-// import authRoutes from './auth.routes';
-import categoriesRoutes from './categories.routes';
-import transactionsRoutes from './transactions.routes';
-import dashboardRoutes from './dashboard.routes';
-import reportsRoutes from './reports.routes';
-import donationTargetsRoutes from './donation-targets.routes';
-import usersRoutes from './users.routes';
-import profileRoutes from './profile.routes';
-import siteSettingsRoutes from './site-settings.routes';
+// import authRoutes from './auth.routes.js';
+import categoriesRoutes from './categories.routes.js';
+import transactionsRoutes from './transactions.routes.js';
+import dashboardRoutes from './dashboard.routes.js';
+import reportsRoutes from './reports.routes.js';
+import donationTargetsRoutes from './donation-targets.routes.js';
+import usersRoutes from './users.routes.js';
+import profileRoutes from './profile.routes.js';
+import siteSettingsRoutes from './site-settings.routes.js';
 
-import uploadRoutes from './upload.routes';
+import uploadRoutes from './upload.routes.js';
 
-import { exportRouter } from './export.routes';
-import feedbackRoutes from './feedbacks.routes';
+import { exportRouter } from './export.routes.js';
+import feedbackRoutes from './feedbacks.routes.js';
 
 export const router: Router = Router();
 

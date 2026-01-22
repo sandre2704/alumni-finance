@@ -1,8 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { transactionService } from '../services/transaction.service';
+import { transactionService } from '../services/transaction.service.js';
 import { z } from 'zod';
-import { AppError } from '../middleware/error-handler';
-import { authMiddleware } from '../middleware/auth';
+import { AppError } from '../middleware/error-handler.js';
+import { authMiddleware } from '../middleware/auth.js';
 
 const router: Router = Router();
 

@@ -1,5 +1,5 @@
-import { db } from '../db';
-import { siteSettings, TransferInfo } from '../db/schema';
+import { db } from '../db/index.js';
+import { siteSettings, TransferInfo } from '../db/schema/index.js';
 import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 

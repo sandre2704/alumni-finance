@@ -25,6 +25,13 @@ app.use(helmet({
 app.use(cors({
     origin: (origin, callback) => {
         const allowedOrigins = env.CORS_ORIGIN.split(',').map(o => o.trim());
+
+        // Debug logging
+        if (origin && !allowedOrigins.includes(origin)) {
+            console.log('⚠️ CORS Blocked: ' + origin);
+            console.log('allowedOrigins: ' + JSON.stringify(allowedOrigins));
+        }
+
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
 

@@ -67,7 +67,8 @@ export const AuthService = {
     loginWithGoogle: async () => {
         const { data, error } = await signIn.social({
             provider: "google",
-            callbackURL: "http://localhost:5173/complete-profile"
+            // window.location.origin akan mengambil domain aktif (localhost atau vercel)
+            callbackURL: `${window.location.origin}/complete-profile`
         });
 
         if (error) {

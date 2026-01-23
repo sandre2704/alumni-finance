@@ -1,7 +1,7 @@
-import { db } from './index'; // Hapus .js
-import { categories } from './schema/categories'; // Hapus .js
-import { user, account } from './schema/auth'; // Hapus .js
-import { transactions } from './schema/transactions'; // Hapus .js
+import { db } from './index.js'; // Hapus .js
+import { categories } from './schema/categories.js'; // Hapus .js
+import { user, account } from './schema/auth.js'; // Hapus .js
+import { transactions } from './schema/transactions.js'; // Hapus .js
 import { eq } from 'drizzle-orm';
 
 async function seed() {

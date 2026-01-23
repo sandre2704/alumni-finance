@@ -6,14 +6,7 @@ dotenv.config({ path: "./.env" });
 
 export default defineConfig({
     // Trik: Arahkan langsung ke folder, bukan ke file index.ts
-    schema: [
-        "./src/db/schema/auth.ts",
-        "./src/db/schema/categories.ts",
-        "./src/db/schema/transactions.ts",
-        "./src/db/schema/donation-targets.ts",
-        "./src/db/schema/feedbacks.ts",
-        "./src/db/schema/site-settings.ts",
-    ],
+    schema: "./src/db/schema/*.ts",
     out: "./src/db/migrations",
     dialect: "postgresql",
     dbCredentials: {

@@ -15,6 +15,20 @@
       "when": 1768360691962,
       "tag": "0001_add_profile_completed",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1769172424515,
+      "tag": "0002_lucky_amphibian",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1769172667639,
+      "tag": "0003_marvelous_viper",
+      "breakpoints": true
     }
   ]
 }

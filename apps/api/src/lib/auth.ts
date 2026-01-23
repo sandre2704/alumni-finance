@@ -76,7 +76,7 @@ export const auth = betterAuth({
             clientSecret: env.GOOGLE_CLIENT_SECRET,
         },
     },
-    trustedOrigins: ["http://localhost:5173", "http://localhost:3000"],
+    trustedOrigins: env.CORS_ORIGIN.split(',').map(o => o.trim()),
     baseURL: env.BETTER_AUTH_URL,
     debug: true,
     callbacks: {

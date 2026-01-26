@@ -72,6 +72,9 @@ async function seed() {
                 email: adminEmail,
                 password: adminPassword,
                 name: adminName,
+                role: 'admin',
+                username: 'admin',
+                profileCompleted: true,
             }
         });
 

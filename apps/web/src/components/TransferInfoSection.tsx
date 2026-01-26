@@ -120,38 +120,38 @@ export const TransferInfoSection = () => {
         <div className="space-y-6">
             {/* Header Section */}
             <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Info Transfer & Donasi</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Kelola informasi rekening bank dan kontak yang ditampilkan kepada donatur.
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Info Transfer & Donasi</h3>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                    Kelola informasi rekening bank dan kontak.
                 </p>
             </div>
 
             {/* Internal Tabs */}
             <div className="border-b border-gray-200 dark:border-gray-700">
-                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                <nav className="-mb-px flex space-x-4 sm:space-x-8" aria-label="Tabs">
                     <button
                         onClick={() => setActiveTab('accounts')}
                         className={`
-                            whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2
+                            whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2
                             ${activeTab === 'accounts'
                                 ? 'border-primary text-primary'
                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'}
                         `}
                     >
-                        <span className="material-symbols-outlined text-[20px]">account_balance</span>
-                        Daftar Rekening
+                        <span className="material-symbols-outlined text-[18px] sm:text-[20px]">account_balance</span>
+                        <span className="hidden sm:inline">Daftar</span> Rekening
                     </button>
                     <button
                         onClick={() => setActiveTab('general')}
                         className={`
-                            whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2
+                            whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2
                             ${activeTab === 'general'
                                 ? 'border-primary text-primary'
                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'}
                         `}
                     >
-                        <span className="material-symbols-outlined text-[20px]">settings_applications</span>
-                        Konfigurasi Umum
+                        <span className="material-symbols-outlined text-[18px] sm:text-[20px]">settings_applications</span>
+                        <span className="hidden sm:inline">Konfigurasi</span> Umum
                     </button>
                 </nav>
             </div>
@@ -162,23 +162,74 @@ export const TransferInfoSection = () => {
                     <div className="flex justify-end">
                         <button
                             onClick={handleOpenAddAccount}
-                            className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-lg transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40"
+                            className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-primary hover:bg-primary-dark text-white text-xs sm:text-sm font-semibold rounded-lg transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40"
                         >
-                            <span className="material-symbols-outlined text-[20px]">add</span>
+                            <span className="material-symbols-outlined text-[18px] sm:text-[20px]">add</span>
                             Tambah Rekening
                         </button>
                     </div>
 
-                    <div className="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-card-border shadow-sm flex flex-col overflow-hidden">
+                    {/* Mobile Card View */}
+                    <div className="sm:hidden space-y-3">
+                        {formData.bankAccounts.length === 0 ? (
+                            <div className="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-card-border p-4 text-center text-gray-500 dark:text-gray-400 italic text-sm">
+                                Belum ada data rekening.
+                            </div>
+                        ) : (
+                            formData.bankAccounts.map((account, index) => (
+                                <div key={index} className="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-card-border p-4 shadow-sm">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <div className="flex items-center gap-2">
+                                            <div className="size-8 rounded bg-gray-100 dark:bg-white flex items-center justify-center overflow-hidden p-1 shadow-sm">
+                                                <span className="text-[10px] font-bold text-primary truncate">
+                                                    {account.bankName.substring(0, 4).toUpperCase()}
+                                                </span>
+                                            </div>
+                                            <span className="font-medium text-sm text-gray-700 dark:text-gray-200">{account.bankName}</span>
+                                        </div>
+                                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${account.isActive !== false
+                                            ? "bg-green-100 dark:bg-emerald-500/10 text-green-700 dark:text-emerald-400 border-green-200 dark:border-emerald-500/20"
+                                            : "bg-gray-100 dark:bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-500/20"
+                                            }`}>
+                                            {account.isActive !== false ? "Aktif" : "Non-Aktif"}
+                                        </span>
+                                    </div>
+                                    <div className="space-y-1 mb-3">
+                                        <p className="font-mono text-sm text-gray-600 dark:text-gray-300">{account.accountNumber}</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">a.n. {account.accountHolder}</p>
+                                    </div>
+                                    <div className="flex gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                                        <button
+                                            onClick={() => handleEditAccount(index)}
+                                            className="flex-1 flex items-center justify-center gap-1 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-400/10 rounded transition-colors"
+                                        >
+                                            <span className="material-symbols-outlined text-[16px]">edit</span>
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteAccount(index)}
+                                            className="flex-1 flex items-center justify-center gap-1 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-400/10 rounded transition-colors"
+                                        >
+                                            <span className="material-symbols-outlined text-[16px]">delete</span>
+                                            Hapus
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    {/* Desktop Table View */}
+                    <div className="hidden sm:block bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-card-border shadow-sm overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead className="bg-gray-50 dark:bg-card-dark/50 text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-card-border">
                                     <tr>
-                                        <th className="px-6 py-4">Nama Bank</th>
-                                        <th className="px-6 py-4">Nomor Rekening</th>
-                                        <th className="px-6 py-4">Atas Nama</th>
-                                        <th className="px-6 py-4 text-right">Status</th>
-                                        <th className="px-6 py-4 text-right">Aksi</th>
+                                        <th className="px-4 sm:px-6 py-3 sm:py-4">Nama Bank</th>
+                                        <th className="px-4 sm:px-6 py-3 sm:py-4">Nomor Rekening</th>
+                                        <th className="px-4 sm:px-6 py-3 sm:py-4 hidden md:table-cell">Atas Nama</th>
+                                        <th className="px-4 sm:px-6 py-3 sm:py-4 text-right">Status</th>
+                                        <th className="px-4 sm:px-6 py-3 sm:py-4 text-right">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 dark:divide-card-border text-sm">
@@ -191,45 +242,45 @@ export const TransferInfoSection = () => {
                                     ) : (
                                         formData.bankAccounts.map((account, index) => (
                                             <tr key={index} className="group hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="size-8 rounded bg-gray-100 dark:bg-white flex items-center justify-center overflow-hidden p-1 shadow-sm">
+                                                <td className="px-4 sm:px-6 py-3 sm:py-4">
+                                                    <div className="flex items-center gap-2 sm:gap-3">
+                                                        <div className="size-7 sm:size-8 rounded bg-gray-100 dark:bg-white flex items-center justify-center overflow-hidden p-1 shadow-sm">
                                                             <span className="text-[10px] font-bold text-primary truncate max-w-full">
                                                                 {account.bankName.substring(0, 4).toUpperCase()}
                                                             </span>
                                                         </div>
-                                                        <span className="font-medium text-gray-700 dark:text-gray-200">{account.bankName}</span>
+                                                        <span className="font-medium text-xs sm:text-sm text-gray-700 dark:text-gray-200">{account.bankName}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4">
-                                                    <span className="font-mono text-gray-600 dark:text-gray-300 tracking-wide">{account.accountNumber}</span>
+                                                <td className="px-4 sm:px-6 py-3 sm:py-4">
+                                                    <span className="font-mono text-xs sm:text-sm text-gray-600 dark:text-gray-300 tracking-wide">{account.accountNumber}</span>
                                                 </td>
-                                                <td className="px-6 py-4">
-                                                    <span className="text-gray-600 dark:text-gray-300">{account.accountHolder}</span>
+                                                <td className="px-4 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
+                                                    <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">{account.accountHolder}</span>
                                                 </td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${account.isActive !== false
+                                                <td className="px-4 sm:px-6 py-3 sm:py-4 text-right">
+                                                    <span className={`inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-medium border ${account.isActive !== false
                                                         ? "bg-green-100 dark:bg-emerald-500/10 text-green-700 dark:text-emerald-400 border-green-200 dark:border-emerald-500/20"
                                                         : "bg-gray-100 dark:bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-500/20"
                                                         }`}>
                                                         {account.isActive !== false ? "Aktif" : "Non-Aktif"}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <div className="flex items-center justify-end gap-2">
+                                                <td className="px-4 sm:px-6 py-3 sm:py-4 text-right">
+                                                    <div className="flex items-center justify-end gap-1 sm:gap-2">
                                                         <button
                                                             onClick={() => handleEditAccount(index)}
                                                             className="p-1.5 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-400/10 rounded transition-colors"
                                                             title="Edit"
                                                         >
-                                                            <span className="material-symbols-outlined text-[18px]">edit</span>
+                                                            <span className="material-symbols-outlined text-[16px] sm:text-[18px]">edit</span>
                                                         </button>
                                                         <button
                                                             onClick={() => handleDeleteAccount(index)}
                                                             className="p-1.5 text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-400/10 rounded transition-colors"
                                                             title="Hapus"
                                                         >
-                                                            <span className="material-symbols-outlined text-[18px]">delete</span>
+                                                            <span className="material-symbols-outlined text-[16px] sm:text-[18px]">delete</span>
                                                         </button>
                                                     </div>
                                                 </td>
@@ -245,49 +296,49 @@ export const TransferInfoSection = () => {
 
             {/* Tab Content: General Settings */}
             {activeTab === 'general' && (
-                <div className="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-card-border p-6 shadow-sm">
-                    <form onSubmit={handleSaveGeneralSettings} className="grid grid-cols-1 gap-6">
+                <div className="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-card-border p-4 sm:p-6 shadow-sm">
+                    <form onSubmit={handleSaveGeneralSettings} className="grid grid-cols-1 gap-4 sm:gap-6">
                         {/* Contact Info */}
-                        <div className="space-y-4">
-                            <h5 className="text-sm font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Kontak & QRIS</h5>
+                        <div className="space-y-3 sm:space-y-4">
+                            <h5 className="text-xs sm:text-sm font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Kontak & QRIS</h5>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nomor WhatsApp Admin</label>
+                                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nomor WhatsApp Admin</label>
                                 <input
                                     type="text"
                                     value={formData.whatsappNumber}
                                     onChange={(e) => setFormData({ ...formData, whatsappNumber: e.target.value })}
-                                    className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50 text-gray-900 dark:text-white"
+                                    className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50 text-gray-900 dark:text-white text-xs sm:text-sm"
                                     placeholder="08123456789"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Admin</label>
+                                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Admin</label>
                                 <input
                                     type="email"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50 text-gray-900 dark:text-white"
+                                    className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50 text-gray-900 dark:text-white text-xs sm:text-sm"
                                     placeholder="admin@alumni.com"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">URL QRIS (Gambar)</label>
+                                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">URL QRIS (Gambar)</label>
                                 <input
                                     type="text"
                                     value={formData.qrCodeUrl}
                                     onChange={(e) => setFormData({ ...formData, qrCodeUrl: e.target.value })}
-                                    className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50 text-gray-900 dark:text-white"
+                                    className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50 text-gray-900 dark:text-white text-xs sm:text-sm"
                                     placeholder="https://example.com/qris.jpg"
                                 />
                             </div>
                         </div>
 
                         {/* Submit Button */}
-                        <div className="md:col-span-2 flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700">
                             <button
                                 type="submit"
                                 disabled={mutation.isPending}
-                                className="px-6 py-2.5 bg-primary hover:bg-primary-dark text-white font-bold rounded-lg shadow-lg shadow-primary/25 transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+                                className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-primary hover:bg-primary-dark text-white text-xs sm:text-sm font-bold rounded-lg shadow-lg shadow-primary/25 transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
                                 {mutation.isPending ? (
                                     <>
@@ -296,8 +347,8 @@ export const TransferInfoSection = () => {
                                     </>
                                 ) : (
                                     <>
-                                        <span className="material-symbols-outlined">save</span>
-                                        Simpan Perubahan
+                                        <span className="material-symbols-outlined text-lg">save</span>
+                                        Simpan
                                     </>
                                 )}
                             </button>

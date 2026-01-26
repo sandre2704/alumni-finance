@@ -156,48 +156,48 @@ const KategoriSection = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Daftar Kategori</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Kelola kategori pemasukan dan pengeluaran.</p>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Daftar Kategori</h3>
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Kelola kategori pemasukan dan pengeluaran.</p>
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary-dark text-white text-sm font-medium transition-colors"
+                    className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs sm:text-sm font-medium transition-colors w-full sm:w-auto justify-center"
                 >
-                    <span className="material-symbols-outlined text-[20px]">add</span>
+                    <span className="material-symbols-outlined text-[18px] sm:text-[20px]">add</span>
                     Tambah Kategori
                 </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Income Categories */}
-                <div className="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-card-border p-5">
-                    <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-green-500">arrow_downward</span>
+                <div className="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-card-border p-4 sm:p-5">
+                    <h4 className="text-xs sm:text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 sm:mb-4 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-green-500 text-lg sm:text-xl">arrow_downward</span>
                         Pemasukan
                     </h4>
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                         {incomeCategories.length === 0 ? (
-                            <p className="text-sm text-gray-400 italic">Belum ada kategori pemasukan.</p>
+                            <p className="text-xs sm:text-sm text-gray-400 italic">Belum ada kategori pemasukan.</p>
                         ) : incomeCategories.map((category: Category) => (
-                            <div key={category.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 group hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                                <div className="flex items-center gap-3">
-                                    <div className="size-3 rounded-full bg-green-500"></div>
-                                    <span className="font-medium text-gray-900 dark:text-white">{category.name}</span>
+                            <div key={category.id} className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 group hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                    <div className="size-2.5 sm:size-3 rounded-full bg-green-500"></div>
+                                    <span className="font-medium text-xs sm:text-sm text-gray-900 dark:text-white">{category.name}</span>
                                 </div>
-                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="flex gap-1 sm:gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                                     <button
                                         onClick={() => handleEdit(category)}
-                                        className="p-1.5 text-gray-400 hover:text-blue-500 transition-colors"
+                                        className="p-1 sm:p-1.5 text-gray-400 hover:text-blue-500 transition-colors"
                                     >
-                                        <span className="material-symbols-outlined text-[18px]">edit</span>
+                                        <span className="material-symbols-outlined text-[16px] sm:text-[18px]">edit</span>
                                     </button>
                                     <button
                                         onClick={() => handleDelete(category.id, category.name)}
-                                        className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
+                                        className="p-1 sm:p-1.5 text-gray-400 hover:text-red-500 transition-colors"
                                     >
-                                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                                        <span className="material-symbols-outlined text-[16px] sm:text-[18px]">delete</span>
                                     </button>
                                 </div>
                             </div>
@@ -206,37 +206,37 @@ const KategoriSection = () => {
                 </div>
 
                 {/* Expense Categories */}
-                <div className="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-card-border p-5">
-                    <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-red-500">arrow_upward</span>
+                <div className="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-card-border p-4 sm:p-5">
+                    <h4 className="text-xs sm:text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 sm:mb-4 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-red-500 text-lg sm:text-xl">arrow_upward</span>
                         Pengeluaran
                     </h4>
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                         {expenseCategories.length === 0 ? (
-                            <p className="text-sm text-gray-400 italic">Belum ada kategori pengeluaran.</p>
+                            <p className="text-xs sm:text-sm text-gray-400 italic">Belum ada kategori pengeluaran.</p>
                         ) : expenseCategories.map((category: Category) => (
-                            <div key={category.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 group hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                                <div className="flex items-center gap-3">
-                                    <div className="size-3 rounded-full bg-red-500"></div>
+                            <div key={category.id} className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 group hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                    <div className="size-2.5 sm:size-3 rounded-full bg-red-500"></div>
                                     <div className="flex flex-col">
-                                        <span className="font-medium text-gray-900 dark:text-white">{category.name}</span>
+                                        <span className="font-medium text-xs sm:text-sm text-gray-900 dark:text-white">{category.name}</span>
                                         {category.monthlyBudget && parseFloat(category.monthlyBudget) > 0 && (
-                                            <span className="text-xs text-gray-500">Budget: Rp {Number(category.monthlyBudget).toLocaleString('id-ID')}</span>
+                                            <span className="text-[10px] sm:text-xs text-gray-500">Budget: Rp {Number(category.monthlyBudget).toLocaleString('id-ID')}</span>
                                         )}
                                     </div>
                                 </div>
-                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="flex gap-1 sm:gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                                     <button
                                         onClick={() => handleEdit(category)}
-                                        className="p-1.5 text-gray-400 hover:text-blue-500 transition-colors"
+                                        className="p-1 sm:p-1.5 text-gray-400 hover:text-blue-500 transition-colors"
                                     >
-                                        <span className="material-symbols-outlined text-[18px]">edit</span>
+                                        <span className="material-symbols-outlined text-[16px] sm:text-[18px]">edit</span>
                                     </button>
                                     <button
                                         onClick={() => handleDelete(category.id, category.name)}
-                                        className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
+                                        className="p-1 sm:p-1.5 text-gray-400 hover:text-red-500 transition-colors"
                                     >
-                                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                                        <span className="material-symbols-outlined text-[16px] sm:text-[18px]">delete</span>
                                     </button>
                                 </div>
                             </div>
@@ -537,19 +537,19 @@ const UsersSection = () => {
     return (
         <div className="space-y-6">
             {/* Page Heading & Actions */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col gap-4">
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Daftar Pengguna</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Kelola data pengguna dan hak akses.</p>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Daftar Pengguna</h3>
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Kelola data pengguna dan hak akses.</p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
                     {/* Search Bar */}
-                    <div className="relative w-full sm:w-64 md:w-80">
+                    <div className="relative flex-1">
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
-                            <span className="material-symbols-outlined !text-[20px]">search</span>
+                            <span className="material-symbols-outlined !text-[18px] sm:!text-[20px]">search</span>
                         </div>
                         <input
-                            className="block w-full rounded-lg border-0 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white bg-white dark:bg-card-dark ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 shadow-sm transition-shadow outline-none"
+                            className="block w-full rounded-lg border-0 py-2 sm:py-2.5 pl-9 sm:pl-10 pr-3 text-gray-900 dark:text-white bg-white dark:bg-card-dark ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-primary text-xs sm:text-sm sm:leading-6 shadow-sm transition-shadow outline-none"
                             placeholder="Cari nama atau email..."
                             type="text"
                             value={searchQuery}
@@ -559,41 +559,41 @@ const UsersSection = () => {
                     {/* Add Button */}
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="flex items-center justify-center rounded-lg h-[42px] px-5 bg-primary hover:bg-primary-dark text-white text-sm font-bold shadow-lg shadow-primary/20 transition-all active:scale-95 whitespace-nowrap"
+                        className="flex items-center justify-center rounded-lg h-[38px] sm:h-[42px] px-4 sm:px-5 bg-primary hover:bg-primary-dark text-white text-xs sm:text-sm font-bold shadow-lg shadow-primary/20 transition-all active:scale-95 whitespace-nowrap"
                     >
-                        <span className="material-symbols-outlined mr-2 !text-[20px]">add</span>
+                        <span className="material-symbols-outlined mr-1.5 sm:mr-2 !text-[18px] sm:!text-[20px]">add</span>
                         Tambah Bendahara
                     </button>
                 </div>
             </div>
 
             {/* Stats Overview */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-2">
-                <div className="bg-white dark:bg-card-dark p-4 rounded-xl border border-gray-200 dark:border-card-border shadow-sm flex items-center gap-4">
-                    <div className="size-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                        <span className="material-symbols-outlined">group</span>
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-2">
+                <div className="bg-white dark:bg-card-dark p-3 sm:p-4 rounded-xl border border-gray-200 dark:border-card-border shadow-sm flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                    <div className="size-10 sm:size-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                        <span className="material-symbols-outlined text-lg sm:text-2xl">group</span>
                     </div>
-                    <div>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">Total Pengurus</p>
-                        <p className="text-gray-900 dark:text-white text-xl font-bold">{stats.total}</p>
-                    </div>
-                </div>
-                <div className="bg-white dark:bg-card-dark p-4 rounded-xl border border-gray-200 dark:border-card-border shadow-sm flex items-center gap-4">
-                    <div className="size-12 rounded-full bg-green-500/10 flex items-center justify-center text-green-600 dark:text-green-400">
-                        <span className="material-symbols-outlined">check_circle</span>
-                    </div>
-                    <div>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">Akun Aktif</p>
-                        <p className="text-gray-900 dark:text-white text-xl font-bold">{stats.active}</p>
+                    <div className="text-center sm:text-left">
+                        <p className="text-gray-500 dark:text-gray-400 text-[10px] sm:text-sm">Total Pengurus</p>
+                        <p className="text-gray-900 dark:text-white text-lg sm:text-xl font-bold">{stats.total}</p>
                     </div>
                 </div>
-                <div className="bg-white dark:bg-card-dark p-4 rounded-xl border border-gray-200 dark:border-card-border shadow-sm flex items-center gap-4">
-                    <div className="size-12 rounded-full bg-gray-500/10 flex items-center justify-center text-gray-600 dark:text-gray-400">
-                        <span className="material-symbols-outlined">person_off</span>
+                <div className="bg-white dark:bg-card-dark p-3 sm:p-4 rounded-xl border border-gray-200 dark:border-card-border shadow-sm flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                    <div className="size-10 sm:size-12 rounded-full bg-green-500/10 flex items-center justify-center text-green-600 dark:text-green-400">
+                        <span className="material-symbols-outlined text-lg sm:text-2xl">check_circle</span>
                     </div>
-                    <div>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">Nonaktif</p>
-                        <p className="text-gray-900 dark:text-white text-xl font-bold">{stats.inactive}</p>
+                    <div className="text-center sm:text-left">
+                        <p className="text-gray-500 dark:text-gray-400 text-[10px] sm:text-sm">Aktif</p>
+                        <p className="text-gray-900 dark:text-white text-lg sm:text-xl font-bold">{stats.active}</p>
+                    </div>
+                </div>
+                <div className="bg-white dark:bg-card-dark p-3 sm:p-4 rounded-xl border border-gray-200 dark:border-card-border shadow-sm flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                    <div className="size-10 sm:size-12 rounded-full bg-gray-500/10 flex items-center justify-center text-gray-600 dark:text-gray-400">
+                        <span className="material-symbols-outlined text-lg sm:text-2xl">person_off</span>
+                    </div>
+                    <div className="text-center sm:text-left">
+                        <p className="text-gray-500 dark:text-gray-400 text-[10px] sm:text-sm">Nonaktif</p>
+                        <p className="text-gray-900 dark:text-white text-lg sm:text-xl font-bold">{stats.inactive}</p>
                     </div>
                 </div>
             </div>
@@ -604,59 +604,63 @@ const UsersSection = () => {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[25%]">Nama Lengkap</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[20%] hidden md:table-cell">Username</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[20%] hidden sm:table-cell">Email</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[15%] hidden lg:table-cell">Role</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[10%] text-center">Status</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[10%] text-right">Aksi</th>
+                                <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nama</th>
+                                <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">Username</th>
+                                <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">Email</th>
+                                <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden sm:table-cell">Role</th>
+                                <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-center">Status</th>
+                                <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-card-dark">
                             {paginatedUsers.length > 0 ? (
                                 paginatedUsers.map((user) => (
                                     <tr key={user.id} className="group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                                             <div className="flex items-center">
-                                                <div className="h-10 w-10 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm uppercase">
+                                                <div className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs sm:text-sm uppercase">
                                                     {user.name.charAt(0)}
                                                 </div>
-                                                <div className="ml-4">
-                                                    <div className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
-                                                    <div className="text-xs text-gray-500 dark:text-gray-400 md:hidden">@{user.username}</div>
+                                                <div className="ml-2 sm:ml-4">
+                                                    <div className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
+                                                    <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 lg:hidden">@{user.username}</div>
+                                                    {/* Show role badge on mobile */}
+                                                    <span className={`sm:hidden inline-flex mt-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium ${user.role === 'admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'}`}>
+                                                        {user.role}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">@{user.username}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 hidden sm:table-cell">{user.email}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 hidden lg:table-cell capitalize">
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden lg:table-cell">@{user.username}</td>
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">{user.email}</td>
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden sm:table-cell capitalize">
                                             <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${user.role === 'admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'}`}>
                                                 {user.role}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border ${user.isActive
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-center">
+                                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-medium border ${user.isActive
                                                 ? 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/20'
                                                 : 'bg-gray-100 dark:bg-gray-700/30 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600/30'
                                                 }`}>
                                                 {user.isActive ? 'Aktif' : 'Nonaktif'}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <div className="flex items-center justify-end gap-2">
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div className="flex items-center justify-end gap-1 sm:gap-2">
                                                 <button
                                                     onClick={() => handleEdit(user)}
                                                     className="text-gray-400 hover:text-primary dark:hover:text-white p-1 rounded transition-colors"
                                                     title="Edit"
                                                 >
-                                                    <span className="material-symbols-outlined !text-[20px]">edit</span>
+                                                    <span className="material-symbols-outlined !text-[18px] sm:!text-[20px]">edit</span>
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(user.id, user.name)}
                                                     className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 p-1 rounded transition-colors"
                                                     title="Hapus"
                                                 >
-                                                    <span className="material-symbols-outlined !text-[20px]">delete</span>
+                                                    <span className="material-symbols-outlined !text-[18px] sm:!text-[20px]">delete</span>
                                                 </button>
                                             </div>
                                         </td>
@@ -1044,21 +1048,21 @@ export const Settings = () => {
         <div className="bg-background-light dark:bg-background-dark font-display flex flex-col transition-colors duration-200 dark">
 
 
-            <main className="flex-1 w-full max-w-[1280px] mx-auto px-6 md:px-10 py-8">
-                <div className="flex flex-col md:flex-row gap-8">
+            <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-6 md:px-10 py-4 sm:py-6 md:py-8">
+                <div className="flex flex-col md:flex-row gap-4 sm:gap-6 md:gap-8">
                     {/* Sidebar Tabs */}
-                    <aside className="w-full md:w-64 flex-shrink-0">
-                        <nav className="flex flex-row md:flex-col gap-1 overflow-x-auto pb-4 md:pb-0">
+                    <aside className="w-full md:w-56 lg:w-64 flex-shrink-0">
+                        <nav className="flex flex-row md:flex-col gap-1 overflow-x-auto pb-3 md:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
                             {tabs.map(tab => (
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${activeTab === tab.id
+                                    className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${activeTab === tab.id
                                         ? 'bg-primary text-white shadow-lg shadow-primary/25'
                                         : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                                         }`}
                                 >
-                                    <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>{tab.icon}</span>
+                                    <span className="material-symbols-outlined text-[18px] sm:text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>{tab.icon}</span>
                                     {tab.label}
                                 </button>
                             ))}

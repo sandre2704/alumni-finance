@@ -16,7 +16,7 @@ export const auth = betterAuth({
             verification,
         }
     }),
-    session: { 
+    session: {
         expiresIn: 60 * 60, // 1 jam (dalam detik)
         updateAge: 60 * 30, // Refresh session jika user aktif dalam 30 menit terakhir
         cookieCache: {
@@ -67,9 +67,16 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
         requireEmailVerification: true,
+        minPasswordLength: 8, // Minimum 8 karakter
+        maxPasswordLength: 128, // Maximum 128 karakter
         sendResetPassword: async ({ user, url, token }) => {
             await emailService.sendPasswordResetEmail(user.email, url, user.name, token);
         },
+    },
+    rateLimit: {
+        enabled: true,
+        window: 60, // 60 detik
+        max: 10, // Maximum 10 request per menit untuk auth endpoints
     },
     emailVerification: {
         sendVerificationEmail: async ({ user, url }) => {
@@ -86,7 +93,7 @@ export const auth = betterAuth({
     },
     trustedOrigins: env.CORS_ORIGIN.split(',').map(o => o.trim()),
     baseURL: env.BETTER_AUTH_URL,
-    debug: true,
+    debug: env.NODE_ENV !== 'production', // Disable debug di production
     callbacks: {
         session: async ({ session, user }: { session: any, user: any }) => {
             return {

@@ -1021,56 +1021,111 @@ type TabId = 'profile' | 'categories' | 'users' | 'transfer-info';
 
 export const Settings = () => {
     const { isAdmin } = useAuth();
-    const [activeTab, setActiveTab] = useState<TabId>('profile');
+    const [activeTab, setActiveTab] = useState<TabId | null>(null);
 
     // Build tabs based on user role
-    const tabs: { id: TabId; label: string; icon: string }[] = isAdmin
+    const tabs: { id: TabId; label: string; icon: string; description: string }[] = isAdmin
         ? [
-            { id: 'categories', label: 'Kategori', icon: 'category' },
-            { id: 'users', label: 'Pengguna', icon: 'group' },
-            { id: 'transfer-info', label: 'Info Transfer', icon: 'payments' },
-            { id: 'profile', label: 'Akun', icon: 'person' },
+            { id: 'categories', label: 'Kategori', icon: 'category', description: 'Kelola kategori pemasukan dan pengeluaran' },
+            { id: 'users', label: 'Pengguna', icon: 'group', description: 'Kelola data pengguna dan hak akses' },
+            { id: 'transfer-info', label: 'Info Transfer', icon: 'payments', description: 'Atur informasi rekening transfer' },
+            { id: 'profile', label: 'Akun', icon: 'person', description: 'Lihat dan kelola profil Anda' },
         ]
         : [
-            { id: 'profile', label: 'Akun', icon: 'person' },
+            { id: 'profile', label: 'Akun', icon: 'person', description: 'Lihat dan kelola profil Anda' },
         ];
 
-    // Set default active tab based on role
+    // Set default active tab for desktop only
     useEffect(() => {
-        if (isAdmin) {
-            setActiveTab('categories');
-        } else {
-            setActiveTab('profile');
-        }
-    }, [isAdmin]);
+        // On desktop (md and above), set default tab
+        const handleResize = () => {
+            if (window.innerWidth >= 768) {
+                if (activeTab === null) {
+                    setActiveTab(isAdmin ? 'categories' : 'profile');
+                }
+            }
+        };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [isAdmin, activeTab]);
+
+    // Mobile: Show menu list when no tab selected
+    const showMobileMenu = activeTab === null;
 
     return (
         <div className="bg-background-light dark:bg-background-dark font-display flex flex-col transition-colors duration-200 dark">
 
-
             <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-6 md:px-10 py-4 sm:py-6 md:py-8">
                 <div className="flex flex-col md:flex-row gap-4 sm:gap-6 md:gap-8">
-                    {/* Sidebar Tabs */}
-                    <aside className="w-full md:w-56 lg:w-64 flex-shrink-0">
-                        <nav className="flex flex-row md:flex-col gap-1 overflow-x-auto pb-3 md:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
+
+                    {/* Mobile Menu List - Only shown on mobile when no tab selected */}
+                    <div className={`md:hidden ${showMobileMenu ? 'block' : 'hidden'}`}>
+                        <div className="mb-4">
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Pengaturan</h2>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Kelola pengaturan aplikasi Anda</p>
+                        </div>
+                        <div className="space-y-2">
                             {tabs.map(tab => (
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${activeTab === tab.id
+                                    className="w-full flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-card-dark border border-gray-200 dark:border-card-border hover:border-primary/50 dark:hover:border-primary/50 transition-all active:scale-[0.99]"
+                                >
+                                    <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                                        <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>{tab.icon}</span>
+                                    </div>
+                                    <div className="flex-1 text-left">
+                                        <h3 className="font-semibold text-gray-900 dark:text-white">{tab.label}</h3>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">{tab.description}</p>
+                                    </div>
+                                    <span className="material-symbols-outlined text-gray-400 dark:text-gray-500">chevron_right</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Mobile Content with Back Button - Only shown on mobile when tab selected */}
+                    <div className={`md:hidden ${!showMobileMenu ? 'block' : 'hidden'}`}>
+                        {/* Back Button */}
+                        <button
+                            onClick={() => setActiveTab(null)}
+                            className="flex items-center gap-2 mb-4 text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors"
+                        >
+                            <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+                            <span className="text-sm font-medium">Kembali ke Pengaturan</span>
+                        </button>
+
+                        {/* Content */}
+                        <div className="min-w-0">
+                            {activeTab === 'categories' && isAdmin && <KategoriSection />}
+                            {activeTab === 'users' && isAdmin && <UsersSection />}
+                            {activeTab === 'transfer-info' && isAdmin && <TransferInfoSection />}
+                            {activeTab === 'profile' && <ProfileSection />}
+                        </div>
+                    </div>
+
+                    {/* Desktop Sidebar Tabs - Only visible on desktop */}
+                    <aside className="hidden md:block w-56 lg:w-64 flex-shrink-0">
+                        <nav className="flex flex-col gap-1">
+                            {tabs.map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id
                                         ? 'bg-primary text-white shadow-lg shadow-primary/25'
                                         : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                                         }`}
                                 >
-                                    <span className="material-symbols-outlined text-[18px] sm:text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>{tab.icon}</span>
+                                    <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>{tab.icon}</span>
                                     {tab.label}
                                 </button>
                             ))}
                         </nav>
                     </aside>
 
-                    {/* Content Area */}
-                    <div className="flex-1 min-w-0">
+                    {/* Desktop Content Area - Only visible on desktop */}
+                    <div className="hidden md:block flex-1 min-w-0">
                         {activeTab === 'categories' && isAdmin && <KategoriSection />}
                         {activeTab === 'users' && isAdmin && <UsersSection />}
                         {activeTab === 'transfer-info' && isAdmin && <TransferInfoSection />}
@@ -1078,7 +1133,6 @@ export const Settings = () => {
                     </div>
                 </div>
             </main>
-
 
         </div>
     );

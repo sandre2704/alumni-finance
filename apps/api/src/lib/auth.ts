@@ -16,6 +16,14 @@ export const auth = betterAuth({
             verification,
         }
     }),
+    session: { 
+        expiresIn: 60 * 60, // 1 jam (dalam detik)
+        updateAge: 60 * 30, // Refresh session jika user aktif dalam 30 menit terakhir
+        cookieCache: {
+            enabled: true,
+            maxAge: 60 * 5 // Cache 5 menit untuk performa
+        }
+    },
     user: {
         additionalFields: {
             role: {

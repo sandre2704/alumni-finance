@@ -86,34 +86,45 @@ export const Reports = () => {
                 </div>
 
                 <div className="bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-xl p-4 shadow-sm">
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                        <div className="flex flex-1 items-center gap-2">
-                            <div className="flex-1 relative">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                        {/* Start Date */}
+                        <div className="w-full sm:w-auto sm:min-w-[180px]">
+                            <label className="block text-xs font-medium text-slate-500 dark:text-text-secondary mb-1.5 sm:hidden">Dari Tanggal</label>
+                            <div className="relative">
                                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-text-secondary pointer-events-none text-lg">calendar_today</span>
                                 <input
-                                    className="w-full rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-border-dark text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary pl-10 pr-3 h-10 text-sm"
+                                    className="w-full rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-border-dark text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary pl-10 pr-3 h-11 text-sm"
                                     type="date"
                                     value={tempDateRange.startDate}
                                     onChange={(e) => setTempDateRange({ ...tempDateRange, startDate: e.target.value })}
                                 />
                             </div>
-                            <span className="text-slate-400 dark:text-text-secondary text-sm font-medium px-1">—</span>
-                            <div className="flex-1 relative">
+                        </div>
+
+                        {/* Separator - hidden on mobile */}
+                        <span className="hidden sm:block text-slate-400 dark:text-text-secondary text-sm font-medium">—</span>
+
+                        {/* End Date */}
+                        <div className="w-full sm:w-auto sm:min-w-[180px]">
+                            <label className="block text-xs font-medium text-slate-500 dark:text-text-secondary mb-1.5 sm:hidden">Sampai Tanggal</label>
+                            <div className="relative">
                                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-text-secondary pointer-events-none text-lg">event</span>
                                 <input
-                                    className="w-full rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-border-dark text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary pl-10 pr-3 h-10 text-sm"
+                                    className="w-full rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-border-dark text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary pl-10 pr-3 h-11 text-sm"
                                     type="date"
                                     value={tempDateRange.endDate}
                                     onChange={(e) => setTempDateRange({ ...tempDateRange, endDate: e.target.value })}
                                 />
                             </div>
                         </div>
+
+                        {/* Filter Button - inline on desktop, full width on mobile */}
                         <button
                             onClick={handleApplyFilter}
-                            className="h-10 px-5 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/25 whitespace-nowrap"
+                            className="h-11 px-5 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/25 whitespace-nowrap w-full sm:w-auto"
                         >
                             <span className="material-symbols-outlined text-lg">filter_list</span>
-                            <span>Terapkan</span>
+                            <span>Filter</span>
                         </button>
                     </div>
                 </div>

@@ -76,17 +76,17 @@ export const BudgetDetailModal: React.FC<BudgetDetailModalProps> = ({
                 {/* Content */}
                 <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
                     {/* Summary Section */}
-                    <div className="mb-8 bg-gray-50 dark:bg-background-dark/50 p-6 rounded-xl border border-gray-100 dark:border-card-border">
-                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
+                    <div className="mb-6 bg-gray-50 dark:bg-background-dark/50 p-4 sm:p-6 rounded-xl border border-gray-100 dark:border-card-border">
+                        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 mb-4">
                             <div>
-                                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Total Penggunaan</p>
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-3xl font-black text-gray-900 dark:text-white">{formatCurrency(budget.actual)}</span>
-                                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">dari {formatCurrency(budget.budget)}</span>
+                                <p className="text-xs sm:text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Total Penggunaan</p>
+                                <div className="flex items-baseline gap-2 flex-wrap">
+                                    <span className="text-xl sm:text-2xl md:text-3xl font-black text-gray-900 dark:text-white">{formatCurrency(budget.actual)}</span>
+                                    <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">dari {formatCurrency(budget.budget)}</span>
                                 </div>
                             </div>
-                            <div className="text-right">
-                                <span className={`inline-block px-3 py-1 rounded-full text-sm font-bold ${isOverBudget
+                            <div className="text-left sm:text-right">
+                                <span className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold ${isOverBudget
                                     ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
                                     : 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
                                     }`}>
@@ -94,7 +94,7 @@ export const BudgetDetailModal: React.FC<BudgetDetailModalProps> = ({
                                 </span>
                             </div>
                         </div>
-                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden shadow-inner">
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 sm:h-4 overflow-hidden shadow-inner">
                             <div
                                 className={`h-full rounded-full relative transition-all duration-500 ${isOverBudget ? 'bg-red-500' : 'bg-primary'}`}
                                 style={{ width: `${percentage}%` }}
@@ -102,7 +102,7 @@ export const BudgetDetailModal: React.FC<BudgetDetailModalProps> = ({
                                 <div className="absolute inset-0 bg-white/20 w-full h-full animate-pulse"></div>
                             </div>
                         </div>
-                        <div className="flex justify-between mt-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
+                        <div className="flex justify-between mt-2 text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400">
                             <span>0%</span>
                             <span className={isOverBudget ? 'text-red-500' : ''}>
                                 {isOverBudget ? `Melebihi: ${formatCurrency(Math.abs(remaining))}` : `Sisa: ${formatCurrency(remaining)}`}
@@ -112,13 +112,13 @@ export const BudgetDetailModal: React.FC<BudgetDetailModalProps> = ({
                     </div>
 
                     {/* Filter Section */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Riwayat Transaksi</h3>
-                        <div className="flex items-center gap-2">
-                            <div className="relative">
-                                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">search</span>
+                    <div className="flex flex-col gap-3 mb-4 sm:mb-6">
+                        <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Riwayat Transaksi</h3>
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                            <div className="relative flex-1">
+                                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-base sm:text-lg">search</span>
                                 <input
-                                    className="pl-9 pr-4 py-2 bg-white dark:bg-background-dark border border-gray-200 dark:border-card-border rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:border-primary w-full sm:w-64 placeholder-gray-400"
+                                    className="pl-9 pr-4 py-2 bg-white dark:bg-background-dark border border-gray-200 dark:border-card-border rounded-lg text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:border-primary w-full placeholder-gray-400"
                                     placeholder="Cari transaksi..."
                                     type="text"
                                     value={searchTerm}
@@ -131,7 +131,7 @@ export const BudgetDetailModal: React.FC<BudgetDetailModalProps> = ({
                             <select
                                 value={sortOrder}
                                 onChange={(e) => setSortOrder(e.target.value as typeof sortOrder)}
-                                className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-background-dark border border-gray-200 dark:border-card-border rounded-lg text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-card-border transition-colors cursor-pointer outline-none"
+                                className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-background-dark border border-gray-200 dark:border-card-border rounded-lg text-xs sm:text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-card-border transition-colors cursor-pointer outline-none w-full sm:w-auto"
                             >
                                 <option value="date-desc">Terbaru</option>
                                 <option value="date-asc">Terlama</option>
@@ -147,10 +147,10 @@ export const BudgetDetailModal: React.FC<BudgetDetailModalProps> = ({
                             <table className="w-full text-left border-collapse bg-white dark:bg-card-dark">
                                 <thead className="bg-gray-50 dark:bg-background-dark/80">
                                     <tr>
-                                        <th className="py-3 px-5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-card-border">Tanggal</th>
-                                        <th className="py-3 px-5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-card-border">Nama Barang/Keperluan</th>
-                                        <th className="py-3 px-5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-card-border text-right">Nominal</th>
-                                        <th className="py-3 px-5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-card-border">PIC/Admin</th>
+                                        <th className="py-2 sm:py-3 px-2 sm:px-5 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-card-border">Tanggal</th>
+                                        <th className="py-2 sm:py-3 px-2 sm:px-5 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-card-border">Nama</th>
+                                        <th className="py-2 sm:py-3 px-2 sm:px-5 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-card-border text-right">Nominal</th>
+                                        <th className="py-2 sm:py-3 px-2 sm:px-5 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-card-border hidden sm:table-cell">PIC</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 dark:divide-card-border">
@@ -181,23 +181,23 @@ export const BudgetDetailModal: React.FC<BudgetDetailModalProps> = ({
 
                                             return (
                                                 <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-card-border/30 transition-colors">
-                                                    <td className="py-3 px-5 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                                                    <td className="py-2 sm:py-3 px-2 sm:px-5 text-[11px] sm:text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
                                                         {formatDate(t.transactionDate)}
                                                     </td>
-                                                    <td className="py-3 px-5">
-                                                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                                    <td className="py-2 sm:py-3 px-2 sm:px-5">
+                                                        <p className="text-[11px] sm:text-sm font-medium text-gray-900 dark:text-white line-clamp-1">
                                                             {itemName}
                                                         </p>
                                                         {itemDesc && (
-                                                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
                                                                 {itemDesc}
                                                             </p>
                                                         )}
                                                     </td>
-                                                    <td className="py-3 px-5 text-sm font-bold text-gray-900 dark:text-white text-right">
+                                                    <td className="py-2 sm:py-3 px-2 sm:px-5 text-[11px] sm:text-sm font-bold text-gray-900 dark:text-white text-right whitespace-nowrap">
                                                         {formatCurrency(parseFloat(t.amount))}
                                                     </td>
-                                                    <td className="py-3 px-5 text-sm text-gray-600 dark:text-gray-300">
+                                                    <td className="py-2 sm:py-3 px-2 sm:px-5 text-[11px] sm:text-sm text-gray-600 dark:text-gray-300 hidden sm:table-cell">
                                                         {t.user?.username || 'Admin'}
                                                     </td>
                                                 </tr>
@@ -211,20 +211,20 @@ export const BudgetDetailModal: React.FC<BudgetDetailModalProps> = ({
 
                     {/* Pagination */}
                     {totalTransactions > 0 && (
-                        <div className="mt-4 flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-                            <p>Menampilkan {currentPageStart}-{currentPageEnd} dari {totalTransactions} transaksi</p>
-                            <div className="flex gap-2">
+                        <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-[11px] sm:text-sm text-gray-500 dark:text-gray-400">
+                            <p>Menampilkan {currentPageStart}-{currentPageEnd} dari {totalTransactions}</p>
+                            <div className="flex gap-2 self-end sm:self-auto">
                                 <button
                                     onClick={() => setPage(p => Math.max(1, p - 1))}
                                     disabled={page === 1}
-                                    className="px-3 py-1 rounded border border-gray-200 dark:border-card-border hover:bg-gray-100 dark:hover:bg-card-border disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    className="px-2 sm:px-3 py-1 rounded border border-gray-200 dark:border-card-border hover:bg-gray-100 dark:hover:bg-card-border disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm"
                                 >
-                                    Previous
+                                    Prev
                                 </button>
                                 <button
                                     onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                                     disabled={page >= totalPages}
-                                    className="px-3 py-1 rounded border border-gray-200 dark:border-card-border hover:bg-gray-100 dark:hover:bg-card-border text-primary font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    className="px-2 sm:px-3 py-1 rounded border border-gray-200 dark:border-card-border hover:bg-gray-100 dark:hover:bg-card-border text-primary font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm"
                                 >
                                     Next
                                 </button>
@@ -234,16 +234,16 @@ export const BudgetDetailModal: React.FC<BudgetDetailModalProps> = ({
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-gray-200 dark:border-card-border bg-gray-50 dark:bg-card-dark flex justify-end gap-3 rounded-b-xl">
+                <div className="p-4 sm:p-6 border-t border-gray-200 dark:border-card-border bg-gray-50 dark:bg-card-dark flex justify-end gap-2 sm:gap-3 rounded-b-xl">
                     <button
-                        className="px-4 py-2 rounded-lg border border-gray-200 dark:border-card-border text-gray-600 dark:text-gray-300 font-semibold hover:bg-gray-100 dark:hover:bg-card-border transition-colors"
+                        className="px-3 sm:px-4 py-2 rounded-lg border border-gray-200 dark:border-card-border text-gray-600 dark:text-gray-300 font-semibold hover:bg-gray-100 dark:hover:bg-card-border transition-colors text-xs sm:text-sm"
                         onClick={() => alert('Fitur export akan datang segera!')}
                     >
                         Unduh PDF
                     </button>
                     <button
                         onClick={onClose}
-                        className="px-6 py-2 rounded-lg bg-primary text-white font-bold hover:bg-blue-700 shadow-lg shadow-primary/25 transition-all"
+                        className="px-4 sm:px-6 py-2 rounded-lg bg-primary text-white font-bold hover:bg-blue-700 shadow-lg shadow-primary/25 transition-all text-xs sm:text-sm"
                     >
                         Tutup
                     </button>

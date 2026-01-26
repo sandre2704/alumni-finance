@@ -1,8 +1,9 @@
-import { db } from './index.js'; // Hapus .js
-import { categories } from './schema/categories.js'; // Hapus .js
-import { user, account } from './schema/auth.js'; // Hapus .js
-import { transactions } from './schema/transactions.js'; // Hapus .js
-import { eq } from 'drizzle-orm';
+import { db } from './index.js';
+import { categories } from './schema/categories.js';
+import { user, account } from './schema/auth.js';
+import { transactions } from './schema/transactions.js';
+import { eq, and } from 'drizzle-orm';
+import { auth } from '../lib/auth.js';
 
 async function seed() {
     console.log('🌱 Seeding database...');
@@ -30,24 +31,87 @@ async function seed() {
 
     // 2. Seed Users
     console.log('👤 Seeding users...');
-    // better-auth uses scrypt/argon2, but we can't easily generate that here without imports.
-    // For now, we will seed users without password capability or use a known hash if possible.
-    // Alternatively, we skip password seeding and expect OAuth or manual reset.
-    // We will insert into 'user' table only for now, as 'account' requires proper provider structure.
 
-    // Admin
-    const [admin] = await db.insert(user).values({
-        id: crypto.randomUUID(),
-        username: 'admin',
-        email: 'admin@alumnifinance.com',
-        name: 'Bendahara Alumni',
-        emailVerified: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        role: 'admin',
-    }).onConflictDoUpdate({ target: user.email, set: { name: 'Bendahara Alumni', username: 'admin' } }).returning();
+    // Admin Credentials
+    const adminEmail = 'admin@alumnifinance.com';
+    const adminPassword = 'password123';
+    const adminName = 'Bendahara Alumni';
 
-    // Members
+    let adminUser;
+
+    // cleanup: Check if user exists but has no account (password)
+    const existingUser = await db.query.user.findFirst({
+        where: eq(user.email, adminEmail)
+    });
+
+    if (existingUser) {
+        const existingAccount = await db.query.account.findFirst({
+            where: eq(account.userId, existingUser.id)
+        });
+
+        if (!existingAccount) {
+            console.log('⚠️ Found admin user without password (clean or old seed). Recreating...');
+            // Delete linked transactions first to avoid foreign key constraints
+            await db.delete(transactions).where(eq(transactions.createdBy, existingUser.id));
+            // Delete the 'zombie' user so we can create a fresh one with password
+            await db.delete(user).where(eq(user.id, existingUser.id));
+        } else {
+            // If account exists, force recreate to guarantee 'password123' works.
+            console.log('🔄 Recreating admin user to ensure default credentials...');
+            await db.delete(transactions).where(eq(transactions.createdBy, existingUser.id));
+            await db.delete(account).where(eq(account.userId, existingUser.id));
+            await db.delete(user).where(eq(user.id, existingUser.id));
+        }
+    }
+
+    try {
+        console.log(`Creation admin user: ${adminEmail}`);
+
+        const result = await auth.api.signUpEmail({
+            body: {
+                email: adminEmail,
+                password: adminPassword,
+                name: adminName,
+            }
+        });
+
+        if (result && result.user) {
+            adminUser = result.user;
+            console.log('Admin user created via auth.');
+        }
+
+    } catch (e: any) {
+        // If it fails, maybe user exists (race condition or other issue). 
+        console.log('Admin creation note:', e.message || e);
+    }
+
+    if (!adminUser) {
+        // Try to fetch again
+        const existing = await db.select().from(user).where(eq(user.email, adminEmail)).limit(1);
+        if (existing.length > 0) {
+            adminUser = existing[0];
+        }
+    }
+
+    if (!adminUser) {
+        console.error('❌ Failed to create or find admin user. Transactions will not be seeded.');
+        process.exit(1);
+    }
+
+    // Force Admin Role & Verification & Profile Completed
+    await db.update(user)
+        .set({
+            role: 'admin',
+            emailVerified: true,
+            isActive: true,
+            profileCompleted: true,
+            updatedAt: new Date()
+        })
+        .where(eq(user.id, adminUser.id));
+
+    console.log(`✅ Admin Ready: ${adminEmail} / ${adminPassword}`);
+
+    // Members (Guests)
     const members = [
         { email: 'budi@alumni.com', name: 'Budi Santoso', username: 'budi' },
         { email: 'siti@alumni.com', name: 'Siti Aminah', username: 'siti' },
@@ -132,7 +196,7 @@ async function seed() {
             donorName: tx.donor || undefined,
             status: tx.status as 'paid' | 'processing',
             transactionDate: tx.date,
-            createdBy: admin.id, // Admin created these records
+            createdBy: adminUser.id, // Linked to Admin
         });
     }
 

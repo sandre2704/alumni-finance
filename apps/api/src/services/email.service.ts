@@ -9,7 +9,7 @@ const transporter = isEmailConfigured
     ? nodemailer.createTransport({
         host: env.SMTP_HOST,
         port: parseInt(env.SMTP_PORT),
-        secure: env.SMTP_PORT === '465' || env.SMTP_PORT === 465, // true for 465, false for other ports
+        secure: env.SMTP_PORT === '465', // true for 465, false for other ports
         auth: {
             user: env.SMTP_USER,
             pass: env.SMTP_PASS,

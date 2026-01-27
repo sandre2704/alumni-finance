@@ -76,7 +76,7 @@ export const auth = betterAuth({
     rateLimit: {
         enabled: true,
         window: 60, // 60 detik
-        max: 10, // Maximum 10 request per menit untuk auth endpoints
+        max: 100, // Maximum 100 request per menit untuk auth endpoints
     },
     emailVerification: {
         sendVerificationEmail: async ({ user, url }) => {

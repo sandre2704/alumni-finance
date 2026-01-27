@@ -1,144 +1,160 @@
+import { Resend } from 'resend';
 import nodemailer from 'nodemailer';
 import { env } from '../config/env.js';
 
-// Check if email is configured
-const isEmailConfigured = !!(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS && env.SMTP_FROM);
+// Prefer Resend (HTTP API) over SMTP for cloud deployments
+const useResend = !!env.RESEND_API_KEY;
+const resend = useResend ? new Resend(env.RESEND_API_KEY) : null;
 
-// Create reusable transporter only if configured
-const transporter = isEmailConfigured
+// Fallback to SMTP (for local development)
+const isSmtpConfigured = !!(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS && env.SMTP_FROM);
+const transporter = !useResend && isSmtpConfigured
     ? nodemailer.createTransport({
-        ...(env.SMTP_HOST === 'smtp.gmail.com' ? {
-            service: 'gmail',
-            auth: {
-                user: env.SMTP_USER,
-                pass: env.SMTP_PASS,
-            }
-        } : {
-            host: env.SMTP_HOST,
-            port: parseInt(env.SMTP_PORT),
-            secure: env.SMTP_PORT === '465',
-            auth: {
-                user: env.SMTP_USER,
-                pass: env.SMTP_PASS,
-            },
-        }),
-        tls: {
-            rejectUnauthorized: false
+        host: env.SMTP_HOST,
+        port: parseInt(env.SMTP_PORT),
+        secure: env.SMTP_PORT === '465',
+        auth: {
+            user: env.SMTP_USER,
+            pass: env.SMTP_PASS,
         },
-        connectionTimeout: 60000, // 60s
-        greetingTimeout: 60000,   // 60s
-        socketTimeout: 60000,     // 60s
-        family: 4,
-    } as any)
+    })
     : null;
 
-if (isEmailConfigured) {
-    console.log('📧 SMTP Configured.');
+// Log configuration
+if (useResend) {
+    console.log('📧 Email configured: Resend (HTTP API)');
+} else if (isSmtpConfigured) {
+    console.log('📧 Email configured: SMTP');
     console.log(`   Host: ${env.SMTP_HOST}`);
-    console.log(`   User: ${env.SMTP_USER}`);
-    console.log(`   Mode: ${env.SMTP_HOST === 'smtp.gmail.com' ? 'Gmail Service' : 'Manual'}`);
-}
-
-if (!isEmailConfigured) {
-    console.warn('⚠️ SMTP not configured. Email features will be disabled.');
-    console.warn('   Add SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_FROM to .env to enable emails.');
 } else {
-    console.log('✅ SMTP configured! Email features are enabled.');
-    console.log(`   Host: ${env.SMTP_HOST}, From: ${env.SMTP_FROM}`);
+    console.warn('⚠️ No email service configured. Email features disabled.');
 }
 
 export const emailService = {
     async sendVerificationEmail(to: string, url: string, name: string) {
-        if (!transporter) {
-            console.log(`📧 [DEV MODE] Verification email would be sent to ${to}`);
-            console.log(`   Verification URL: ${url}`);
-            return; // Skip sending in dev mode without SMTP
-        }
-
         // Rewrite callbackURL to redirect to frontend verify-email page
         const primaryOrigin = env.CORS_ORIGIN.split(',')[0].trim();
         const frontendCallbackUrl = encodeURIComponent(`${primaryOrigin}/verify-email?verified=true`);
         const modifiedUrl = url.replace(/callbackURL=[^&]*/, `callbackURL=${frontendCallbackUrl}`);
 
-        const mailOptions = {
-            from: `"Alumni Finance" <${env.SMTP_FROM}>`,
-            to,
-            subject: 'Verifikasi Email Anda - Alumni Finance',
-            html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                    <h1 style="color: #2424eb; text-align: center;">Alumni Finance</h1>
-                    <h2 style="text-align: center;">Verifikasi Email Anda</h2>
-                    <p>Halo ${name},</p>
-                    <p>Terima kasih telah mendaftar di Alumni Finance. Silakan klik tombol di bawah ini untuk memverifikasi email Anda:</p>
-                    <div style="text-align: center; margin: 30px 0;">
-                        <a href="${modifiedUrl}" style="background-color: #2424eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                            Verifikasi Email
-                        </a>
-                    </div>
-                    <p>Atau salin dan tempel link berikut di browser Anda:</p>
-                    <p style="word-break: break-all; color: #666;">${modifiedUrl}</p>
-                    <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-                    <p style="color: #999; font-size: 12px; text-align: center;">
-                        Jika Anda tidak mendaftar di Alumni Finance, abaikan email ini.
-                    </p>
+        const html = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h1 style="color: #2424eb; text-align: center;">Alumni Finance</h1>
+                <h2 style="text-align: center;">Verifikasi Email Anda</h2>
+                <p>Halo ${name},</p>
+                <p>Terima kasih telah mendaftar di Alumni Finance. Silakan klik tombol di bawah ini untuk memverifikasi email Anda:</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="${modifiedUrl}" style="background-color: #2424eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                        Verifikasi Email
+                    </a>
                 </div>
-            `,
-        };
+                <p>Atau salin dan tempel link berikut di browser Anda:</p>
+                <p style="word-break: break-all; color: #666;">${modifiedUrl}</p>
+                <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+                <p style="color: #999; font-size: 12px; text-align: center;">
+                    Jika Anda tidak mendaftar di Alumni Finance, abaikan email ini.
+                </p>
+            </div>
+        `;
 
-        try {
-            await transporter.sendMail(mailOptions);
-            console.log(`✅ Verification email sent to ${to}`);
-        } catch (error) {
-            console.error('❌ Failed to send verification email:', error);
-            throw error;
+        // Use Resend (HTTP API)
+        if (resend) {
+            try {
+                await resend.emails.send({
+                    from: `Alumni Finance <${env.RESEND_FROM_EMAIL}>`,
+                    to: [to],
+                    subject: 'Verifikasi Email Anda - Alumni Finance',
+                    html,
+                });
+                console.log(`✅ Verification email sent to ${to} via Resend`);
+            } catch (error) {
+                console.error('❌ Failed to send verification email via Resend:', error);
+                throw error;
+            }
+            return;
         }
+
+        // Use SMTP (fallback)
+        if (transporter) {
+            try {
+                await transporter.sendMail({
+                    from: `"Alumni Finance" <${env.SMTP_FROM}>`,
+                    to,
+                    subject: 'Verifikasi Email Anda - Alumni Finance',
+                    html,
+                });
+                console.log(`✅ Verification email sent to ${to} via SMTP`);
+            } catch (error) {
+                console.error('❌ Failed to send verification email via SMTP:', error);
+                throw error;
+            }
+            return;
+        }
+
+        // No email service configured (dev mode)
+        console.log(`📧 [DEV MODE] Verification email would be sent to ${to}`);
+        console.log(`   Verification URL: ${modifiedUrl}`);
     },
 
     async sendPasswordResetEmail(to: string, url: string, name: string, token?: string) {
-        // Construct frontend URL if token is available
-        // This bypasses the server-side redirect link generated by better-auth
-        let resetLink = url;
-        if (token) {
-            const primaryOrigin = env.CORS_ORIGIN.split(',')[0].trim();
-            resetLink = `${primaryOrigin}/reset-password?token=${token}`;
-        }
+        const primaryOrigin = env.CORS_ORIGIN.split(',')[0].trim();
+        const resetLink = token ? `${primaryOrigin}/reset-password?token=${token}` : url;
 
-        if (!transporter) {
-            console.log(`📧 [DEV MODE] Password reset email would be sent to ${to}`);
-            console.log(`   Reset URL: ${resetLink}`);
-            return; // Skip sending in dev mode without SMTP
-        }
-
-        const mailOptions = {
-            from: `"Alumni Finance" <${env.SMTP_FROM}>`,
-            to,
-            subject: 'Reset Password - Alumni Finance',
-            html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                    <h1 style="color: #2424eb; text-align: center;">Alumni Finance</h1>
-                    <h2 style="text-align: center;">Reset Password</h2>
-                    <p>Halo ${name},</p>
-                    <p>Kami menerima permintaan untuk mereset password Anda. Klik tombol di bawah ini:</p>
-                    <div style="text-align: center; margin: 30px 0;">
-                        <a href="${resetLink}" style="background-color: #2424eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                            Reset Password
-                        </a>
-                    </div>
-                    <p>Link ini akan kadaluarsa dalam 1 jam.</p>
-                    <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-                    <p style="color: #999; font-size: 12px; text-align: center;">
-                        Jika Anda tidak meminta reset password, abaikan email ini.
-                    </p>g
+        const html = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h1 style="color: #2424eb; text-align: center;">Alumni Finance</h1>
+                <h2 style="text-align: center;">Reset Password</h2>
+                <p>Halo ${name},</p>
+                <p>Kami menerima permintaan untuk mereset password Anda. Klik tombol di bawah ini:</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="${resetLink}" style="background-color: #2424eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                        Reset Password
+                    </a>
                 </div>
-            `,
-        };
+                <p>Link ini akan kadaluarsa dalam 1 jam.</p>
+                <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+                <p style="color: #999; font-size: 12px; text-align: center;">
+                    Jika Anda tidak meminta reset password, abaikan email ini.
+                </p>
+            </div>
+        `;
 
-        try {
-            await transporter.sendMail(mailOptions);
-            console.log(`✅ Password reset email sent to ${to}`);
-        } catch (error) {
-            console.error('❌ Failed to send password reset email:', error);
-            throw error;
+        // Use Resend (HTTP API)
+        if (resend) {
+            try {
+                await resend.emails.send({
+                    from: `Alumni Finance <${env.RESEND_FROM_EMAIL}>`,
+                    to: [to],
+                    subject: 'Reset Password - Alumni Finance',
+                    html,
+                });
+                console.log(`✅ Password reset email sent to ${to} via Resend`);
+            } catch (error) {
+                console.error('❌ Failed to send password reset email via Resend:', error);
+                throw error;
+            }
+            return;
         }
+
+        // Use SMTP (fallback)
+        if (transporter) {
+            try {
+                await transporter.sendMail({
+                    from: `"Alumni Finance" <${env.SMTP_FROM}>`,
+                    to,
+                    subject: 'Reset Password - Alumni Finance',
+                    html,
+                });
+                console.log(`✅ Password reset email sent to ${to} via SMTP`);
+            } catch (error) {
+                console.error('❌ Failed to send password reset email via SMTP:', error);
+                throw error;
+            }
+            return;
+        }
+
+        // No email service configured (dev mode)
+        console.log(`📧 [DEV MODE] Password reset email would be sent to ${to}`);
+        console.log(`   Reset URL: ${resetLink}`);
     },
 };

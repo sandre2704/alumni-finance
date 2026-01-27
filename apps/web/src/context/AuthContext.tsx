@@ -20,7 +20,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Convert better-auth user to our User interface if necessary, usually it matches
     let user = session?.user as User | null;
-    console.log('AuthContext user:', user);
 
     const login = async (email: string, pass: string) => {
         await AuthService.login(email, pass);

@@ -27,6 +27,7 @@ const formatDate = (dateString: string) => {
 export const Transactions = () => {
     const { user } = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
     const [viewAttachment, setViewAttachment] = useState<{ isOpen: boolean; url: string; type: 'image' | 'pdf' }>({
         isOpen: false,
         url: '',
@@ -157,8 +158,8 @@ export const Transactions = () => {
                 )}
             </div>
 
-            {/* Filters & Search Toolbar */}
-            <div className="bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-800 rounded-xl p-4 mb-6 shadow-sm">
+            {/* Desktop Filters & Search Toolbar */}
+            <div className="hidden md:block bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-800 rounded-xl p-4 mb-6 shadow-sm">
                 <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
                     {/* Search Input */}
                     <div className="relative flex-1 min-w-[200px]">
@@ -228,6 +229,186 @@ export const Transactions = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Mobile Search & Filter Toggle */}
+            <div className="md:hidden bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-800 rounded-xl p-3 mb-4 shadow-sm">
+                <div className="flex items-center gap-2">
+                    {/* Search Input */}
+                    <div className="relative flex-1">
+                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-lg">search</span>
+                        <input
+                            className="w-full h-10 pl-10 pr-3 rounded-lg border-0 bg-gray-50 dark:bg-background-dark ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-primary text-sm transition-all"
+                            placeholder="Cari transaksi..."
+                            type="text"
+                            value={tempFilters.search}
+                            onChange={(e) => setTempFilters({ ...tempFilters, search: e.target.value })}
+                            onKeyDown={(e) => e.key === 'Enter' && handleApplyFilter()}
+                        />
+                    </div>
+                    {/* Filter Toggle Button */}
+                    <button
+                        onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
+                        className={`relative h-10 w-10 flex items-center justify-center rounded-lg transition-colors ${isMobileFilterOpen ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-gray-800 text-slate-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                    >
+                        <span className="material-symbols-outlined text-xl">tune</span>
+                        {/* Active filter indicator */}
+                        {(filters.type || filters.categoryId || filters.startDate || filters.endDate) && (
+                            <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-surface-dark"></span>
+                        )}
+                    </button>
+                </div>
+
+                {/* Active Filters Display */}
+                {(filters.type || filters.categoryId || filters.startDate || filters.endDate) && !isMobileFilterOpen && (
+                    <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+                        {filters.type && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-medium">
+                                {filters.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}
+                                <button onClick={() => { setFilters({ ...filters, type: '' }); setTempFilters({ ...tempFilters, type: '' }); }} className="hover:bg-primary/20 rounded-full p-0.5">
+                                    <span className="material-symbols-outlined text-[14px]">close</span>
+                                </button>
+                            </span>
+                        )}
+                        {filters.categoryId && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-medium">
+                                {categories?.find(c => c.id === filters.categoryId)?.name}
+                                <button onClick={() => { setFilters({ ...filters, categoryId: '' }); setTempFilters({ ...tempFilters, categoryId: '' }); }} className="hover:bg-primary/20 rounded-full p-0.5">
+                                    <span className="material-symbols-outlined text-[14px]">close</span>
+                                </button>
+                            </span>
+                        )}
+                        {(filters.startDate || filters.endDate) && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-medium">
+                                {filters.startDate && new Date(filters.startDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                                {filters.startDate && filters.endDate && ' - '}
+                                {filters.endDate && new Date(filters.endDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                                <button onClick={() => { setFilters({ ...filters, startDate: '', endDate: '' }); setTempFilters({ ...tempFilters, startDate: '', endDate: '' }); }} className="hover:bg-primary/20 rounded-full p-0.5">
+                                    <span className="material-symbols-outlined text-[14px]">close</span>
+                                </button>
+                            </span>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {/* Mobile Bottom Sheet Filter */}
+            {isMobileFilterOpen && (
+                <>
+                    {/* Backdrop */}
+                    <div
+                        className="md:hidden fixed inset-0 bg-black/50 z-40 animate-fade-in"
+                        onClick={() => setIsMobileFilterOpen(false)}
+                    />
+                    {/* Bottom Sheet */}
+                    <div className="md:hidden fixed inset-x-0 bottom-0 z-50 bg-white dark:bg-surface-dark rounded-t-2xl shadow-2xl animate-slide-up">
+                        {/* Handle */}
+                        <div className="flex justify-center pt-3 pb-2">
+                            <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+                        </div>
+
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100 dark:border-gray-800">
+                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Filter Transaksi</h3>
+                            <button
+                                onClick={() => setIsMobileFilterOpen(false)}
+                                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            >
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+
+                        {/* Filter Content */}
+                        <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
+                            {/* Type Filter */}
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Tipe Transaksi</label>
+                                <div className="grid grid-cols-3 gap-2">
+                                    <button
+                                        onClick={() => setTempFilters({ ...tempFilters, type: '' })}
+                                        className={`py-2.5 px-3 rounded-lg text-sm font-medium transition-all ${tempFilters.type === '' ? 'bg-primary text-white shadow-md' : 'bg-gray-100 dark:bg-gray-800 text-slate-600 dark:text-slate-300'}`}
+                                    >
+                                        Semua
+                                    </button>
+                                    <button
+                                        onClick={() => setTempFilters({ ...tempFilters, type: 'income' })}
+                                        className={`py-2.5 px-3 rounded-lg text-sm font-medium transition-all ${tempFilters.type === 'income' ? 'bg-emerald-500 text-white shadow-md' : 'bg-gray-100 dark:bg-gray-800 text-slate-600 dark:text-slate-300'}`}
+                                    >
+                                        Pemasukan
+                                    </button>
+                                    <button
+                                        onClick={() => setTempFilters({ ...tempFilters, type: 'expense' })}
+                                        className={`py-2.5 px-3 rounded-lg text-sm font-medium transition-all ${tempFilters.type === 'expense' ? 'bg-red-500 text-white shadow-md' : 'bg-gray-100 dark:bg-gray-800 text-slate-600 dark:text-slate-300'}`}
+                                    >
+                                        Pengeluaran
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Category Filter */}
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Kategori</label>
+                                <select
+                                    className="w-full h-11 px-3 pr-8 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-gray-700 text-sm text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-primary focus:border-primary cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg%20xmlns%3d%22http%3a%2f%2fwww.w3.org%2f2000%2fsvg%22%20width%3d%2212%22%20height%3d%2212%22%20viewBox%3d%220%200%2012%2012%22%3e%3cpath%20fill%3d%22%239ca3af%22%20d%3d%22M2%204l4%204%204-4%22%2f%3e%3c%2fsvg%3e')] bg-[length:12px] bg-[right_12px_center] bg-no-repeat"
+                                    value={tempFilters.categoryId}
+                                    onChange={(e) => setTempFilters({ ...tempFilters, categoryId: e.target.value })}
+                                >
+                                    <option value="">Semua Kategori</option>
+                                    {categories?.map(c => (
+                                        <option key={c.id} value={c.id}>{c.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Date Range Filter */}
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Rentang Tanggal</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">Dari</label>
+                                        <input
+                                            type="date"
+                                            className="w-full h-11 px-3 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-gray-700 text-sm text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-primary focus:border-primary"
+                                            value={tempFilters.startDate}
+                                            onChange={(e) => setTempFilters({ ...tempFilters, startDate: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">Sampai</label>
+                                        <input
+                                            type="date"
+                                            className="w-full h-11 px-3 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-gray-700 text-sm text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-primary focus:border-primary"
+                                            value={tempFilters.endDate}
+                                            onChange={(e) => setTempFilters({ ...tempFilters, endDate: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="p-4 border-t border-gray-100 dark:border-gray-800 flex gap-3 pb-safe">
+                            <button
+                                onClick={() => {
+                                    handleResetFilter();
+                                    setIsMobileFilterOpen(false);
+                                }}
+                                className="flex-1 h-12 px-4 text-slate-600 dark:text-slate-300 font-medium rounded-xl border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            >
+                                Reset
+                            </button>
+                            <button
+                                onClick={() => {
+                                    handleApplyFilter();
+                                    setIsMobileFilterOpen(false);
+                                }}
+                                className="flex-1 h-12 px-4 bg-primary hover:bg-primary-dark text-white font-medium rounded-xl transition-colors shadow-lg shadow-primary/25"
+                            >
+                                Terapkan Filter
+                            </button>
+                        </div>
+                    </div>
+                </>
+            )}
 
             {/* Data Table */}
             <div className="bg-white dark:bg-surface-dark rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden flex flex-col">

@@ -44,6 +44,8 @@ const BackendError = () => (
 
 import { Layout } from './components/Layout';
 
+import { AuthWatcher } from './components/AuthWatcher';
+
 const AppContent = () => {
     const { error } = useAuth();
 
@@ -57,6 +59,7 @@ const AppContent = () => {
     return (
         <BrowserRouter>
             <ScrollToTop />
+            <AuthWatcher />
             <Routes>
                 {/* Routes with Sidebar Layout */}
                 <Route element={<Layout />}>

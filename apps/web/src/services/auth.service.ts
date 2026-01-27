@@ -68,7 +68,7 @@ export const AuthService = {
         const { data, error } = await signIn.social({
             provider: "google",
             // window.location.origin akan mengambil domain aktif (localhost atau vercel)
-            callbackURL: `${window.location.origin}/complete-profile`
+            callbackURL: window.location.origin
         });
 
         if (error) {

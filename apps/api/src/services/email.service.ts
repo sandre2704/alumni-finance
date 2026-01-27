@@ -7,23 +7,32 @@ const isEmailConfigured = !!(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS && 
 // Create reusable transporter only if configured
 const transporter = isEmailConfigured
     ? nodemailer.createTransport({
-        ...(env.SMTP_HOST === 'smtp.gmail.com' ? { service: 'gmail' } : {
-            host: env.SMTP_HOST,
-            port: parseInt(env.SMTP_PORT),
-            secure: env.SMTP_PORT === '465',
-        }),
+        host: env.SMTP_HOST,
+        port: parseInt(env.SMTP_PORT),
+        secure: env.SMTP_PORT === '465', // true for 465, false for other ports
         auth: {
             user: env.SMTP_USER,
             pass: env.SMTP_PASS,
         },
+        tls: {
+            rejectUnauthorized: false // Help with some cloud network handshake issues
+        },
         // Increase connection timeout for cloud environments (Railway, Vercel)
-        connectionTimeout: 10000, // 10 seconds
-        greetingTimeout: 10000,   // 10 seconds
-        socketTimeout: 20000,     // 20 seconds
+        connectionTimeout: 20000, // 20 seconds
+        greetingTimeout: 20000,   // 20 seconds
+        socketTimeout: 30000,     // 30 seconds
         // Force IPv4 as some cloud providers have issues with IPv6 for SMTP
         family: 4,
-    } as any) // Cast to any to avoid stricter type checking on optional fields if types are mismatched
+    } as any)
     : null;
+
+if (isEmailConfigured) {
+    console.log('📧 SMTP Configured with:');
+    console.log(`   Host: ${env.SMTP_HOST}`);
+    console.log(`   Port: ${env.SMTP_PORT}`);
+    console.log(`   User: ${env.SMTP_USER}`);
+    console.log(`   Secure: ${env.SMTP_PORT === '465'}`);
+}
 
 if (!isEmailConfigured) {
     console.warn('⚠️ SMTP not configured. Email features will be disabled.');

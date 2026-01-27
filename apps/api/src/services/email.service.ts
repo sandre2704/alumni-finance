@@ -9,12 +9,18 @@ const transporter = isEmailConfigured
     ? nodemailer.createTransport({
         host: env.SMTP_HOST,
         port: parseInt(env.SMTP_PORT),
-        secure: env.SMTP_PORT === '465', // true for 465, false for other ports
+        secure: env.SMTP_PORT === '465' || env.SMTP_PORT === 465, // true for 465, false for other ports
         auth: {
             user: env.SMTP_USER,
             pass: env.SMTP_PASS,
         },
-    })
+        // Increase connection timeout for cloud environments (Railway, Vercel)
+        connectionTimeout: 10000, // 10 seconds
+        greetingTimeout: 10000,   // 10 seconds
+        socketTimeout: 20000,     // 20 seconds
+        // Force IPv4 as some cloud providers have issues with IPv6 for SMTP
+        family: 4,
+    } as any) // Cast to any to avoid stricter type checking on optional fields if types are mismatched
     : null;
 
 if (!isEmailConfigured) {

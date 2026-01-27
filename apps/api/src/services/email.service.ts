@@ -7,9 +7,11 @@ const isEmailConfigured = !!(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS && 
 // Create reusable transporter only if configured
 const transporter = isEmailConfigured
     ? nodemailer.createTransport({
-        host: env.SMTP_HOST,
-        port: parseInt(env.SMTP_PORT),
-        secure: env.SMTP_PORT === '465', // true for 465, false for other ports
+        ...(env.SMTP_HOST === 'smtp.gmail.com' ? { service: 'gmail' } : {
+            host: env.SMTP_HOST,
+            port: parseInt(env.SMTP_PORT),
+            secure: env.SMTP_PORT === '465',
+        }),
         auth: {
             user: env.SMTP_USER,
             pass: env.SMTP_PASS,

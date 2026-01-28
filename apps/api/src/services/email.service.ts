@@ -32,8 +32,12 @@ if (useResend) {
 
 export const emailService = {
     async sendVerificationEmail(to: string, url: string, name: string) {
-        // Rewrite callbackURL to redirect to frontend verify-email page
-        const primaryOrigin = env.CORS_ORIGIN.split(',')[0].trim();
+        // Smart frontend URL selection based on environment
+        const origins = env.CORS_ORIGIN.split(',').map(o => o.trim());
+        const primaryOrigin = env.NODE_ENV === 'production'
+            ? origins.find(o => !o.includes('localhost')) || origins[0]
+            : origins.find(o => o.includes('localhost')) || origins[0];
+
         const frontendCallbackUrl = encodeURIComponent(`${primaryOrigin}/verify-email?verified=true`);
         const modifiedUrl = url.replace(/callbackURL=[^&]*/, `callbackURL=${frontendCallbackUrl}`);
 
@@ -97,7 +101,12 @@ export const emailService = {
     },
 
     async sendPasswordResetEmail(to: string, url: string, name: string, token?: string) {
-        const primaryOrigin = env.CORS_ORIGIN.split(',')[0].trim();
+        // Smart frontend URL selection based on environment
+        const origins = env.CORS_ORIGIN.split(',').map(o => o.trim());
+        const primaryOrigin = env.NODE_ENV === 'production'
+            ? origins.find(o => !o.includes('localhost')) || origins[0]
+            : origins.find(o => o.includes('localhost')) || origins[0];
+
         const resetLink = token ? `${primaryOrigin}/reset-password?token=${token}` : url;
 
         const html = `

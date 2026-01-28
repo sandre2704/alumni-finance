@@ -2,30 +2,37 @@ import { Resend } from 'resend';
 import nodemailer from 'nodemailer';
 import { env } from '../config/env.js';
 
-// Prefer Resend (HTTP API) over SMTP for cloud deployments
-const useResend = !!env.RESEND_API_KEY;
-const resend = useResend ? new Resend(env.RESEND_API_KEY) : null;
+// Prefer SMTP per user request (even though Railway blocks it, we will try)
+// const useResend = !!env.RESEND_API_KEY; // Disabled for now
+const useResend = false;
+const resend = null;
 
-// Fallback to SMTP (for local development)
+// SMTP Configuration
 const isSmtpConfigured = !!(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS && env.SMTP_FROM);
-const transporter = !useResend && isSmtpConfigured
+const transporter = isSmtpConfigured
     ? nodemailer.createTransport({
         host: env.SMTP_HOST,
         port: parseInt(env.SMTP_PORT),
-        secure: env.SMTP_PORT === '465',
+        secure: env.SMTP_PORT === '465', // true for 465, false for other ports
         auth: {
             user: env.SMTP_USER,
             pass: env.SMTP_PASS,
         },
+        // Debug and connection settings
+        debug: true,
+        logger: true,
+        connectionTimeout: 30000, // 30 seconds
+        greetingTimeout: 30000,
+        socketTimeout: 30000,
     })
     : null;
 
 // Log configuration
-if (useResend) {
-    console.log('📧 Email configured: Resend (HTTP API)');
-} else if (isSmtpConfigured) {
-    console.log('📧 Email configured: SMTP');
+if (isSmtpConfigured) {
+    console.log('📧 Email configured: SMTP (Primary)');
     console.log(`   Host: ${env.SMTP_HOST}`);
+    console.log(`   Port: ${env.SMTP_PORT}`);
+    console.log(`   User: ${env.SMTP_USER}`);
 } else {
     console.warn('⚠️ No email service configured. Email features disabled.');
 }

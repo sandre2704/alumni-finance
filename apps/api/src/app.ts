@@ -80,7 +80,11 @@ app.get('/', (req, res) => {
 });
 
 // API routes - Better Auth handler
-app.all("/api/auth/*", toNodeHandler(auth));
+// Debug: Log all auth requests to see what's reaching the server
+app.all("/api/auth/*", (req, res, next) => {
+    console.log(`🔐 Auth request: ${req.method} ${req.url}`);
+    next();
+}, toNodeHandler(auth));
 app.use('/api', router);
 
 // Error handling

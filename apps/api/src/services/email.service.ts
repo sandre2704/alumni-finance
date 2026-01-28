@@ -71,22 +71,12 @@ export const emailService = {
             </div>
         `;
 
+        /* Resend logic removed to fix type error and rely on SMTP
         // Use Resend (HTTP API)
         if (resend) {
-            try {
-                await resend.emails.send({
-                    from: `Alumni Finance <${env.RESEND_FROM_EMAIL}>`,
-                    to: [to],
-                    subject: 'Verifikasi Email Anda - Alumni Finance',
-                    html,
-                });
-                console.log(`✅ Verification email sent to ${to} via Resend`);
-            } catch (error) {
-                console.error('❌ Failed to send verification email via Resend:', error);
-                throw error;
-            }
-            return;
+            // ...
         }
+        */
 
         // Use SMTP (fallback)
         if (transporter) {
@@ -138,22 +128,12 @@ export const emailService = {
             </div>
         `;
 
+        /* Resend logic removed to fix type error and rely on SMTP
         // Use Resend (HTTP API)
         if (resend) {
-            try {
-                await resend.emails.send({
-                    from: `Alumni Finance <${env.RESEND_FROM_EMAIL}>`,
-                    to: [to],
-                    subject: 'Reset Password - Alumni Finance',
-                    html,
-                });
-                console.log(`✅ Password reset email sent to ${to} via Resend`);
-            } catch (error) {
-                console.error('❌ Failed to send password reset email via Resend:', error);
-                throw error;
-            }
-            return;
+            // ...
         }
+        */
 
         // Use SMTP (fallback)
         if (transporter) {

@@ -79,8 +79,8 @@ app.get('/', (req, res) => {
     });
 });
 
-// API routes
-app.all("/api/auth/*", toNodeHandler(auth));
+// API routes - Better Auth handler (use *splat for proper path matching)
+app.all("/api/auth/*splat", toNodeHandler(auth));
 app.use('/api', router);
 
 // Error handling

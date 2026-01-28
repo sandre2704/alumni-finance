@@ -68,6 +68,20 @@ app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Custom short verify endpoint - workaround for Railway blocking /api/auth/verify-email
+// This endpoint proxies to better-auth's verify-email handler
+app.get('/api/verify', (req, res) => {
+    const { token, callbackURL } = req.query;
+    console.log('📧 Custom verify endpoint hit');
+    // Redirect to the actual better-auth verify-email endpoint internally
+    const verifyUrl = `/api/auth/verify-email?token=${token}&callbackURL=${callbackURL}`;
+    // Forward the request internally
+    req.url = verifyUrl;
+    req.originalUrl = verifyUrl;
+    // Let the auth handler process it
+    return toNodeHandler(auth)(req, res);
+});
+
 app.get('/', (req, res) => {
     res.json({
         message: 'Alumni Finance API is running 🚀',

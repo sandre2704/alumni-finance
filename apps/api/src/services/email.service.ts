@@ -39,7 +39,10 @@ export const emailService = {
             : origins.find(o => o.includes('localhost')) || origins[0];
 
         const frontendCallbackUrl = encodeURIComponent(`${primaryOrigin}/verify-email?verified=true`);
-        const modifiedUrl = url.replace(/callbackURL=[^&]*/, `callbackURL=${frontendCallbackUrl}`);
+        // Use custom /api/verify endpoint instead of /api/auth/verify-email (Railway blocks the latter)
+        const modifiedUrl = url
+            .replace('/api/auth/verify-email', '/api/verify')
+            .replace(/callbackURL=[^&]*/, `callbackURL=${frontendCallbackUrl}`);
 
         const html = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">

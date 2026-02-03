@@ -1,20 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { feedbackService, CreateFeedbackData } from '../services/feedback.service';
 
-export const useFeedbacks = (status?: string) => {
+export const useFeedbacks = (status?: string, options?: { enabled?: boolean }) => {
     return useQuery({
         queryKey: ['feedbacks', status],
         queryFn: () => feedbackService.getAll(status),
         // Refresh every minute
         refetchInterval: 60000,
+        enabled: options?.enabled,
     });
 };
 
-export const useFeedbackUnreadCount = () => {
+export const useFeedbackUnreadCount = (options?: { enabled?: boolean }) => {
     return useQuery({
         queryKey: ['feedbacks', 'unread-count'],
         queryFn: () => feedbackService.getUnreadCount(),
         refetchInterval: 30000,
+        enabled: options?.enabled,
     });
 };
 

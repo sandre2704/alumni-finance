@@ -44,6 +44,11 @@ export const useMidtrans = (): UseMidtransReturn => {
             try {
                 // Get client config from backend
                 const clientConfig = await DonationsService.getClientConfig();
+
+                if (!clientConfig.clientKey) {
+                    throw new Error('Midtrans Client Key belum dikonfigurasi');
+                }
+
                 setConfig(clientConfig);
 
                 // Determine Snap URL based on environment

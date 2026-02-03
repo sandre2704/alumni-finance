@@ -18,8 +18,8 @@ export const Header = ({ onOpenSidebar, isCollapsed }: HeaderProps) => {
     const profileRef = useRef<HTMLDivElement>(null);
 
     // Notification Data
-    const { data: unreadCount = 0 } = useFeedbackUnreadCount();
-    const { data: feedbacksData } = useFeedbacks('pending');
+    const { data: unreadCount = 0 } = useFeedbackUnreadCount({ enabled: !!isAdmin });
+    const { data: feedbacksData } = useFeedbacks('pending', { enabled: !!isAdmin });
     const pendingFeedbacks = feedbacksData?.slice(0, 5) || [];
 
     const handleLogout = async () => {

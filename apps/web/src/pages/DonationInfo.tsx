@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { SiteSettingsService } from "../services/site-settings.service";
 import { useQuery } from "@tanstack/react-query";
+import { PublicDonationModal } from "../components/PublicDonationModal";
 
 export const DonationInfo = () => {
     const { data: transferInfo, isLoading } = useQuery({
@@ -10,6 +11,8 @@ export const DonationInfo = () => {
     });
 
     const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+    const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
+    const [isManualTransferExpanded, setIsManualTransferExpanded] = useState(false);
 
     const handleCopy = (text: string, index: number) => {
         navigator.clipboard.writeText(text);
@@ -28,222 +31,223 @@ export const DonationInfo = () => {
     const bankAccounts = transferInfo?.bankAccounts?.filter(account => account.isActive !== false) || [];
     const hasBankAccounts = bankAccounts.length > 0;
 
-    // Gradient patterns for bank cards to add visual variety
+    // Gradient patterns for bank cards
     const cardGradients = [
-        "linear-gradient(135deg, #2424eb 0%, #111122 100%)", // Blue
-        "linear-gradient(135deg, #6d28d9 0%, #111122 100%)", // Purple
-        "linear-gradient(135deg, #0d9488 0%, #111122 100%)", // Teal
-        "linear-gradient(135deg, #be123c 0%, #111122 100%)", // Rose
+        "linear-gradient(135deg, #2424eb 0%, #111122 100%)",
+        "linear-gradient(135deg, #6d28d9 0%, #111122 100%)",
+        "linear-gradient(135deg, #0d9488 0%, #111122 100%)",
+        "linear-gradient(135deg, #be123c 0%, #111122 100%)",
     ];
 
     return (
         <div className="relative flex h-auto w-full flex-col overflow-x-hidden bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display antialiased selection:bg-primary selection:text-white">
 
-
             <main className="layout-container flex h-full grow flex-col">
                 <div className="px-4 md:px-20 lg:px-40 flex flex-1 justify-center py-8">
-                    <div className="layout-content-container flex flex-col max-w-[1200px] flex-1">
+                    <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
 
-                        {/* Page Header */}
-                        <div className="flex flex-wrap justify-between gap-3 p-4 mb-4">
-                            <div className="flex flex-col gap-3">
-                                <h1 className="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
-                                    Panduan Transfer Donasi
-                                </h1>
-                                <p className="text-gray-600 dark:text-text-secondary text-base font-normal leading-normal max-w-2xl">
-                                    Ikuti panduan di bawah ini untuk melakukan transfer donasi. Pastikan nomor rekening tujuan sudah sesuai sebelum melakukan transaksi.
-                                </p>
+                        {/* Hero Section - Primary CTA */}
+                        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-primary/80 p-8 md:p-12 mb-8 shadow-2xl shadow-primary/20">
+                            {/* Background decoration */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                            <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2"></div>
+
+                            <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
+                                <div className="flex-1 text-center md:text-left">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white/90 text-xs font-medium mb-4">
+                                        <span className="material-symbols-outlined text-sm">verified</span>
+                                        <span>Aman & Terverifikasi</span>
+                                    </div>
+                                    <h1 className="text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em] mb-4">
+                                        Donasi untuk Alumni
+                                    </h1>
+                                    <p className="text-white/80 text-base md:text-lg leading-relaxed mb-6 max-w-lg">
+                                        Berkontribusi untuk kegiatan alumni dengan mudah dan aman. Pilih target donasi atau donasi umum untuk kas organisasi.
+                                    </p>
+                                    <button
+                                        onClick={() => setIsDonationModalOpen(true)}
+                                        className="inline-flex items-center justify-center gap-3 rounded-xl h-14 px-8 bg-white text-primary font-bold text-base shadow-xl shadow-black/20 transition-all hover:shadow-2xl hover:shadow-black/30 hover:-translate-y-1 hover:bg-gray-50"
+                                    >
+                                        <span className="material-symbols-outlined text-2xl">volunteer_activism</span>
+                                        <span>Donasi Sekarang</span>
+                                    </button>
+                                </div>
+                                <div className="hidden md:flex items-center justify-center">
+                                    <div className="relative">
+                                        <div className="w-32 h-32 rounded-full bg-white/10 flex items-center justify-center">
+                                            <span className="material-symbols-outlined text-6xl text-white/80">favorite</span>
+                                        </div>
+                                        <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-green-400 flex items-center justify-center shadow-lg">
+                                            <span className="material-symbols-outlined text-white text-lg">check</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Main Content Layout */}
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 p-4">
-
-                            {/* Left Column: Bank Accounts */}
-                            <div className="lg:col-span-7 flex flex-col gap-6">
-                                <div className="flex items-center gap-2 pb-2">
-                                    <span className="material-symbols-outlined text-primary">account_balance_wallet</span>
-                                    <h2 className="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">
-                                        Rekening Tujuan
-                                    </h2>
+                        {/* Features */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                            <div className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark">
+                                <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+                                    <span className="material-symbols-outlined text-blue-600 dark:text-blue-400">speed</span>
                                 </div>
-
-                                {!hasBankAccounts ? (
-                                    <div className="p-6 bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm text-center">
-                                        <p className="text-gray-500 dark:text-text-secondary italic">Belum ada informasi rekening.</p>
-                                    </div>
-                                ) : (
-                                    bankAccounts.map((account, index) => (
-                                        <div key={index} className="flex flex-col sm:flex-row items-stretch justify-between gap-4 rounded-xl bg-white dark:bg-card-dark p-6 shadow-lg border border-gray-200 dark:border-border-dark hover:border-primary/50 transition-colors group relative overflow-hidden">
-                                            <div className="flex flex-[2_2_0px] flex-col justify-between gap-4 z-10">
-                                                <div className="flex flex-col gap-1">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <div className="bg-gray-100 dark:bg-white/10 p-1.5 rounded text-gray-700 dark:text-white">
-                                                            <span className="material-symbols-outlined text-[20px]">account_balance</span>
-                                                        </div>
-                                                        <p className="text-gray-500 dark:text-text-secondary text-sm font-medium uppercase tracking-wider">
-                                                            {account.bankName}
-                                                        </p>
-                                                    </div>
-                                                    <p className="text-gray-900 dark:text-white text-2xl font-bold leading-tight tracking-wide font-mono">
-                                                        {account.accountNumber}
-                                                    </p>
-                                                    <p className="text-gray-500 dark:text-text-secondary text-sm font-normal leading-normal">
-                                                        a.n {account.accountHolder}
-                                                    </p>
-                                                </div>
-                                                <button
-                                                    onClick={() => handleCopy(account.accountNumber, index)}
-                                                    className="flex items-center justify-center gap-2 rounded-lg h-9 px-4 bg-gray-100 dark:bg-border-dark text-gray-700 dark:text-white hover:bg-primary hover:text-white dark:hover:bg-primary transition-colors text-sm font-medium leading-normal w-fit group-hover:bg-gray-200 dark:group-hover:bg-border-dark/80 dark:group-hover:hover:bg-primary"
-                                                >
-                                                    <span className="material-symbols-outlined text-[18px]">
-                                                        {copiedIndex === index ? 'check' : 'content_copy'}
-                                                    </span>
-                                                    <span>{copiedIndex === index ? 'Tersalin' : 'Salin No. Rek'}</span>
-                                                </button>
-                                            </div>
-                                            {/* Decorative Gradient Background */}
-                                            <div
-                                                className="hidden sm:block w-32 bg-center bg-no-repeat bg-cover rounded-lg opacity-80 mix-blend-overlay absolute right-6 top-6 bottom-6"
-                                                style={{ backgroundImage: cardGradients[index % cardGradients.length] }}
-                                            ></div>
-                                        </div>
-                                    ))
-                                )}
-
-                                {/* QRIS Section if available */}
-                                {transferInfo?.qrCodeUrl && (
-                                    <div className="rounded-xl bg-white dark:bg-card-dark p-6 shadow-lg border border-gray-200 dark:border-border-dark flex flex-col items-center text-center">
-                                        <h3 className="text-gray-900 dark:text-white text-lg font-bold mb-4">Scan QRIS</h3>
-                                        <div className="bg-white p-4 rounded-xl inline-block border border-gray-200">
-                                            <img src={transferInfo.qrCodeUrl} alt="QRIS Code" className="w-48 h-48 object-contain" />
-                                        </div>
-                                    </div>
-                                )}
+                                <div>
+                                    <p className="text-gray-900 dark:text-white font-semibold text-sm">Proses Cepat</p>
+                                    <p className="text-gray-500 dark:text-text-secondary text-xs">Konfirmasi otomatis</p>
+                                </div>
                             </div>
-
-                            {/* Right Column: Guide & Info */}
-                            <div className="lg:col-span-5 flex flex-col gap-8">
-
-                                {/* Steps Section */}
-                                <div className="flex flex-col gap-6">
-                                    <div className="flex items-center gap-2 pb-2">
-                                        <span className="material-symbols-outlined text-primary">format_list_numbered</span>
-                                        <h2 className="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">
-                                            Langkah Transfer
-                                        </h2>
-                                    </div>
-
-                                    <div className="relative flex flex-col gap-0 pl-2">
-                                        {/* Vertical Line */}
-                                        <div className="absolute left-[19px] top-4 bottom-4 w-0.5 bg-gray-200 dark:bg-border-dark"></div>
-
-                                        {/* Step 1 */}
-                                        <div className="relative flex gap-4 pb-8 group">
-                                            <div className="z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white dark:bg-card-dark border-2 border-primary text-primary font-bold shadow-sm group-hover:bg-primary group-hover:text-white transition-colors">
-                                                1
-                                            </div>
-                                            <div className="flex flex-col pt-1.5">
-                                                <p className="text-gray-900 dark:text-white text-base font-bold leading-tight">Pilih Bank Tujuan</p>
-                                                <p className="text-gray-500 dark:text-text-secondary text-sm mt-1">Salin salah satu nomor rekening yang tersedia di samping kiri.</p>
-                                            </div>
-                                        </div>
-
-                                        {/* Step 2 */}
-                                        <div className="relative flex gap-4 pb-8 group">
-                                            <div className="z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white dark:bg-card-dark border-2 border-primary text-primary font-bold shadow-sm group-hover:bg-primary group-hover:text-white transition-colors">
-                                                2
-                                            </div>
-                                            <div className="flex flex-col pt-1.5">
-                                                <p className="text-gray-900 dark:text-white text-base font-bold leading-tight">Masukkan Nominal</p>
-                                                <p className="text-gray-500 dark:text-text-secondary text-sm mt-1">Input nominal donasi sesuai keikhlasan Anda pada aplikasi banking.</p>
-                                            </div>
-                                        </div>
-
-                                        {/* Step 3 */}
-                                        <div className="relative flex gap-4 pb-8 group">
-                                            <div className="z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white dark:bg-card-dark border-2 border-primary text-primary font-bold shadow-sm group-hover:bg-primary group-hover:text-white transition-colors">
-                                                3
-                                            </div>
-                                            <div className="flex flex-col pt-1.5">
-                                                <p className="text-gray-900 dark:text-white text-base font-bold leading-tight">
-                                                    Berita Transfer <span className="text-xs font-normal text-gray-500 dark:text-text-secondary bg-gray-100 dark:bg-white/5 px-2 py-0.5 rounded ml-2">Opsional</span>
-                                                </p>
-                                                <p className="text-gray-500 dark:text-text-secondary text-sm mt-1">Tambahkan keterangan "Donasi Alumni" jika memungkinkan.</p>
-                                            </div>
-                                        </div>
-
-                                        {/* Step 4 */}
-                                        <div className="relative flex gap-4 group">
-                                            <div className="z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white dark:bg-card-dark border-2 border-primary text-primary font-bold shadow-sm group-hover:bg-primary group-hover:text-white transition-colors">
-                                                4
-                                            </div>
-                                            <div className="flex flex-col pt-1.5">
-                                                <p className="text-gray-900 dark:text-white text-base font-bold leading-tight">Simpan Bukti</p>
-                                                <p className="text-gray-500 dark:text-text-secondary text-sm mt-1">Screenshot atau simpan resi transfer untuk keperluan konfirmasi jika dibutuhkan.</p>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark">
+                                <div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
+                                    <span className="material-symbols-outlined text-green-600 dark:text-green-400">verified_user</span>
                                 </div>
-
-
-                                {/* Info Box: Auto Confirmation */}
-                                <div className="rounded-xl bg-blue-50 dark:bg-primary/10 border border-blue-100 dark:border-primary/20 p-5 mt-2">
-                                    <div className="flex gap-4">
-                                        <div className="shrink-0 mt-1">
-                                            <span className="material-symbols-outlined text-blue-600 dark:text-primary">verified_user</span>
-                                        </div>
-                                        <div className="flex flex-col gap-1">
-                                            <p className="text-gray-900 dark:text-white text-base font-bold">Konfirmasi Otomatis</p>
-                                            <p className="text-gray-600 dark:text-text-secondary text-sm leading-relaxed">
-                                                Sistem kami akan memverifikasi mutasi rekening secara berkala. Status donasi Anda akan diperbarui setelah verifikasi.
-                                            </p>
-                                        </div>
-                                    </div>
+                                <div>
+                                    <p className="text-gray-900 dark:text-white font-semibold text-sm">Aman & Terpercaya</p>
+                                    <p className="text-gray-500 dark:text-text-secondary text-xs">Via payment gateway</p>
                                 </div>
+                            </div>
+                            <div className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark">
+                                <div className="p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20">
+                                    <span className="material-symbols-outlined text-purple-600 dark:text-purple-400">payments</span>
+                                </div>
+                                <div>
+                                    <p className="text-gray-900 dark:text-white font-semibold text-sm">Banyak Metode</p>
+                                    <p className="text-gray-500 dark:text-text-secondary text-xs">QRIS, VA, E-Wallet</p>
+                                </div>
+                            </div>
+                        </div>
 
-                                {/* Confirmation & Support Section */}
-                                <div className="rounded-xl bg-white dark:bg-card-dark p-6 border border-gray-200 dark:border-border-dark flex flex-col gap-4 items-start shadow-sm">
-                                    <div className="flex flex-col gap-1">
-                                        <h3 className="text-gray-900 dark:text-white text-lg font-bold">Sudah Transfer?</h3>
-                                        <p className="text-gray-500 dark:text-text-secondary text-sm">
-                                            Segera lakukan konfirmasi agar donasi Anda dapat kami catat.
-                                        </p>
+                        {/* Manual Transfer Section - Collapsible */}
+                        {hasBankAccounts && (
+                            <div className="rounded-xl bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark overflow-hidden">
+                                <button
+                                    onClick={() => setIsManualTransferExpanded(!isManualTransferExpanded)}
+                                    className="w-full flex items-center justify-between p-5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-lg bg-gray-100 dark:bg-white/10">
+                                            <span className="material-symbols-outlined text-gray-600 dark:text-gray-400">account_balance</span>
+                                        </div>
+                                        <div className="text-left">
+                                            <p className="text-gray-900 dark:text-white font-semibold text-sm">Preferensi Transfer Manual?</p>
+                                            <p className="text-gray-500 dark:text-text-secondary text-xs">Lihat rekening tujuan untuk transfer bank</p>
+                                        </div>
                                     </div>
-                                    {transferInfo?.whatsappNumber ? (
-                                        <div className="w-full flex flex-col gap-3">
-                                            <a
-                                                href={`https://wa.me/${transferInfo.whatsappNumber.replace(/^0/, '62').replace(/\D/g, '')}?text=Halo%20Admin,%20saya%20sudah%20melakukan%20transfer%20donasi.%20Mohon%20dikonfirmasi.`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="flex items-center justify-center w-full gap-2 rounded-lg h-10 px-6 bg-green-600 hover:bg-green-700 text-white transition-all font-medium text-sm shadow-md shadow-green-600/20"
-                                            >
-                                                <span className="material-symbols-outlined text-[20px]">check_circle</span>
-                                                <span>Konfirmasi via WhatsApp</span>
-                                            </a>
-                                            <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
-                                                <span>atau butuh bantuan?</span>
+                                    <span className={`material-symbols-outlined text-gray-400 transition-transform ${isManualTransferExpanded ? 'rotate-180' : ''}`}>
+                                        expand_more
+                                    </span>
+                                </button>
+
+                                {isManualTransferExpanded && (
+                                    <div className="border-t border-gray-200 dark:border-border-dark p-5 space-y-6 bg-gray-50 dark:bg-black/20">
+                                        {/* Bank Accounts */}
+                                        <div className="space-y-4">
+                                            <h3 className="text-gray-900 dark:text-white font-bold text-sm flex items-center gap-2">
+                                                <span className="material-symbols-outlined text-primary text-lg">credit_card</span>
+                                                Rekening Tujuan
+                                            </h3>
+                                            <div className="grid gap-3">
+                                                {bankAccounts.map((account, index) => (
+                                                    <div key={index} className="flex flex-col sm:flex-row items-stretch justify-between gap-3 rounded-lg bg-white dark:bg-card-dark p-4 border border-gray-200 dark:border-border-dark">
+                                                        <div className="flex flex-col gap-1">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-gray-500 dark:text-text-secondary text-xs font-medium uppercase tracking-wider">
+                                                                    {account.bankName}
+                                                                </span>
+                                                            </div>
+                                                            <p className="text-gray-900 dark:text-white text-lg font-bold tracking-wide font-mono">
+                                                                {account.accountNumber}
+                                                            </p>
+                                                            <p className="text-gray-500 dark:text-text-secondary text-sm">
+                                                                a.n {account.accountHolder}
+                                                            </p>
+                                                        </div>
+                                                        <button
+                                                            onClick={() => handleCopy(account.accountNumber, index)}
+                                                            className="flex items-center justify-center gap-2 rounded-lg h-9 px-4 bg-gray-100 dark:bg-border-dark text-gray-700 dark:text-white hover:bg-primary hover:text-white transition-colors text-sm font-medium self-start sm:self-center"
+                                                        >
+                                                            <span className="material-symbols-outlined text-[18px]">
+                                                                {copiedIndex === index ? 'check' : 'content_copy'}
+                                                            </span>
+                                                            <span>{copiedIndex === index ? 'Tersalin' : 'Salin'}</span>
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* QRIS if available */}
+                                        {transferInfo?.qrCodeUrl && (
+                                            <div className="space-y-3">
+                                                <h3 className="text-gray-900 dark:text-white font-bold text-sm flex items-center gap-2">
+                                                    <span className="material-symbols-outlined text-primary text-lg">qr_code_2</span>
+                                                    Scan QRIS
+                                                </h3>
+                                                <div className="flex justify-center">
+                                                    <div className="bg-white p-4 rounded-xl border border-gray-200">
+                                                        <img src={transferInfo.qrCodeUrl} alt="QRIS Code" className="w-40 h-40 object-contain" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Steps */}
+                                        <div className="space-y-3">
+                                            <h3 className="text-gray-900 dark:text-white font-bold text-sm flex items-center gap-2">
+                                                <span className="material-symbols-outlined text-primary text-lg">checklist</span>
+                                                Langkah Transfer
+                                            </h3>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                <div className="flex gap-3 p-3 rounded-lg bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark">
+                                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-sm">1</div>
+                                                    <p className="text-gray-600 dark:text-text-secondary text-sm">Salin nomor rekening di atas</p>
+                                                </div>
+                                                <div className="flex gap-3 p-3 rounded-lg bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark">
+                                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-sm">2</div>
+                                                    <p className="text-gray-600 dark:text-text-secondary text-sm">Transfer sesuai nominal</p>
+                                                </div>
+                                                <div className="flex gap-3 p-3 rounded-lg bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark">
+                                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-sm">3</div>
+                                                    <p className="text-gray-600 dark:text-text-secondary text-sm">Simpan bukti transfer</p>
+                                                </div>
+                                                <div className="flex gap-3 p-3 rounded-lg bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark">
+                                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-sm">4</div>
+                                                    <p className="text-gray-600 dark:text-text-secondary text-sm">Konfirmasi via WhatsApp</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* WhatsApp Confirmation */}
+                                        {transferInfo?.whatsappNumber && (
+                                            <div className="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50">
+                                                <div className="flex items-center gap-3 flex-1">
+                                                    <span className="material-symbols-outlined text-green-600 dark:text-green-400">chat</span>
+                                                    <p className="text-green-800 dark:text-green-300 text-sm">Sudah transfer? Konfirmasi ke Admin</p>
+                                                </div>
                                                 <a
-                                                    href={`https://wa.me/${transferInfo.whatsappNumber.replace(/^0/, '62').replace(/\D/g, '')}`}
+                                                    href={`https://wa.me/${transferInfo.whatsappNumber.replace(/^0/, '62').replace(/\D/g, '')}?text=Halo%20Admin,%20saya%20sudah%20melakukan%20transfer%20donasi.%20Mohon%20dikonfirmasi.`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="text-primary hover:underline hover:text-primary-dark"
+                                                    className="flex items-center justify-center gap-2 rounded-lg h-10 px-5 bg-green-600 hover:bg-green-700 text-white transition-all font-medium text-sm shadow-md"
                                                 >
-                                                    Hubungi Admin
+                                                    <span className="material-symbols-outlined text-[18px]">chat</span>
+                                                    <span>WhatsApp</span>
                                                 </a>
                                             </div>
-                                        </div>
-                                    ) : (
-                                        <button disabled className="flex items-center justify-center w-full gap-2 rounded-lg h-10 px-6 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 font-medium text-sm cursor-not-allowed">
-                                            <span>Kontak belum tersedia</span>
-                                        </button>
-                                    )}
-                                </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
-                        </div>
+                        )}
+
                     </div>
                 </div>
             </main>
+
+            {/* Donation Modal */}
+            <PublicDonationModal
+                isOpen={isDonationModalOpen}
+                onClose={() => setIsDonationModalOpen(false)}
+            />
         </div>
     );
 };

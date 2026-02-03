@@ -13,6 +13,7 @@ import uploadRoutes from './upload.routes.js';
 
 import { exportRouter } from './export.routes.js';
 import feedbackRoutes from './feedbacks.routes.js';
+import donationsRoutes from './donations.routes.js';
 
 export const router: Router = Router();
 
@@ -28,4 +29,5 @@ router.use('/export', exportRouter);
 router.use('/profile', profileRoutes);
 router.use('/feedbacks', feedbackRoutes);
 router.use('/site-settings', siteSettingsRoutes);
+router.use('/donations', donationsRoutes);
 

@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { MidtransService } from '../services/midtrans.service.js';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * POST /api/donations/create

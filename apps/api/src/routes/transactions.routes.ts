@@ -65,12 +65,9 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
 // Create transaction
 router.post('/', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        console.log('Received Transaction Payload:', JSON.stringify(req.body, null, 2));
-
         const validation = createTransactionSchema.safeParse(req.body);
 
         if (!validation.success) {
-            console.error('Validation Error:', JSON.stringify(validation.error.format(), null, 2));
             res.status(400).json({
                 success: false,
                 message: 'Validation failed',
@@ -87,11 +84,6 @@ router.post('/', authMiddleware, async (req: Request, res: Response, next: NextF
             data: transaction,
         });
     } catch (error) {
-        try {
-            const fs = require('fs');
-            const path = require('path');
-            fs.writeFileSync(path.join(process.cwd(), 'debug_error.log'), `Error: ${error}\nStack: ${(error as Error).stack}\n`);
-        } catch (e) { }
         next(error);
     }
 });

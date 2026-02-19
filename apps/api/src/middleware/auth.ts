@@ -13,8 +13,8 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
             throw new AppError(401, 'Authentication required');
         }
 
-        (req as any).user = session.user;
-        (req as any).session = session.session;
+        req.user = session.user as any;
+        req.session = session.session as any;
         next();
     } catch (error) {
         next(error);

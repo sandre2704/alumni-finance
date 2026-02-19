@@ -3,8 +3,8 @@ import { useState } from 'react';
 import {
     FEEDBACK_CATEGORY_LABELS,
     FEEDBACK_STATUS_LABELS,
-} from '../services/feedbackMockData';
-import { Feedback } from '../services/feedback.service';
+    Feedback,
+} from '../services/feedback.service';
 import { useFeedbacks, useUpdateFeedbackStatus, useMarkFeedbackAsRead } from '../hooks/useFeedback';
 
 const formatDate = (dateString: string) => {

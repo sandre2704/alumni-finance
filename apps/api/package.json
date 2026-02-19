@@ -15,8 +15,6 @@
         "db:seed": "tsx src/db/seed.ts"
     },
     "dependencies": {
-        "@types/multer": "^2.0.0",
-        "@types/streamifier": "^0.1.2",
         "axios-cookiejar-support": "^6.0.5",
         "better-auth": "^1.2.0",
         "cloudinary": "^2.5.1",
@@ -27,6 +25,7 @@
         "drizzle-orm": "^0.41.0",
         "exceljs": "^4.4.0",
         "express": "^4.21.2",
+        "express-rate-limit": "^7.5.0",
         "helmet": "^8.0.0",
         "midtrans-client": "^1.4.3",
         "morgan": "^1.10.0",
@@ -45,10 +44,12 @@
         "@types/cors": "^2.8.19",
         "@types/express": "^5.0.0",
         "@types/morgan": "^1.9.9",
+        "@types/multer": "^2.0.0",
         "@types/node": "^22.10.5",
         "@types/nodemailer": "^7.0.5",
         "@types/pdfkit": "^0.17.4",
         "@types/pg": "^8.11.10",
+        "@types/streamifier": "^0.1.2",
         "drizzle-kit": "^0.31.8",
         "tsx": "^4.19.2",
         "typescript": "^5.7.2"

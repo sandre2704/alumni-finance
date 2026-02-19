@@ -9,7 +9,13 @@ export interface Category {
     createdAt: string;
 }
 
-export type CreateCategoryDTO = Pick<Category, 'name' | 'type' | 'monthlyBudget'>;
+export interface CreateCategoryInput {
+    name: string;
+    type: 'income' | 'expense';
+    monthlyBudget?: string;
+}
+
+export type UpdateCategoryInput = Partial<CreateCategoryInput>;
 
 export const CategoryService = {
     getAll: async (type?: 'income' | 'expense') => {
@@ -19,12 +25,17 @@ export const CategoryService = {
         return response.data.data;
     },
 
-    create: async (data: CreateCategoryDTO) => {
+    getById: async (id: string) => {
+        const response = await apiClient.get<{ data: Category }>(`/categories/${id}`);
+        return response.data.data;
+    },
+
+    create: async (data: CreateCategoryInput) => {
         const response = await apiClient.post<{ data: Category }>('/categories', data);
         return response.data.data;
     },
 
-    update: async (id: string, data: Partial<CreateCategoryDTO>) => {
+    update: async (id: string, data: UpdateCategoryInput) => {
         const response = await apiClient.put<{ data: Category }>(`/categories/${id}`, data);
         return response.data.data;
     },

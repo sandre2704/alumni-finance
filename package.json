@@ -13,9 +13,5 @@
   "devDependencies": {
     "dotenv": "^17.2.3",
     "turbo": "^1.10.0"
-  },
-  "dependencies": {
-    "drizzle-orm": "^0.45.1",
-    "nodemailer": "^7.0.12"
   }
 }

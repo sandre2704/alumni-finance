@@ -53,3 +53,18 @@ export const feedbackService = {
         return response.data.data;
     },
 };
+
+// Category labels
+export const FEEDBACK_CATEGORY_LABELS: Record<Feedback['category'], string> = {
+    kategori_baru: 'Kategori Baru',
+    fitur: 'Usulan Fitur',
+    kritik: 'Kritik & Saran',
+    lainnya: 'Lainnya',
+};
+
+// Status labels
+export const FEEDBACK_STATUS_LABELS: Record<Feedback['status'], string> = {
+    pending: 'Menunggu',
+    approved: 'Disetujui',
+    rejected: 'Ditolak',
+};

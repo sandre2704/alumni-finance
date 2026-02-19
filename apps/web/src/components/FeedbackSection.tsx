@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FEEDBACK_CATEGORY_LABELS, Feedback } from '../services/feedbackMockData';
+import { FEEDBACK_CATEGORY_LABELS, Feedback } from '../services/feedback.service';
 import { useAuth } from '../hooks/useAuth';
 import { useCreateFeedback } from '../hooks/useFeedback';
 

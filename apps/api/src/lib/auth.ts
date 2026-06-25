@@ -91,7 +91,11 @@ export const auth = betterAuth({
             clientSecret: env.GOOGLE_CLIENT_SECRET,
         },
     },
-    trustedOrigins: env.CORS_ORIGIN.split(',').map(o => o.trim()),
+    trustedOrigins: [
+        ...env.CORS_ORIGIN.split(',').map(o => o.trim()),
+        "https://alumni-finance.vercel.app",
+        /\.vercel\.app$/,  // Allow all Vercel preview deployments
+    ],
     baseURL: env.BETTER_AUTH_URL,
     debug: env.NODE_ENV !== 'production', // Disable debug di production
     callbacks: {

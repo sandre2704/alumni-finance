@@ -108,3 +108,5 @@ app.use('/api', router);
 
 // Error handling
 app.use(errorHandler);
+
+export default app;

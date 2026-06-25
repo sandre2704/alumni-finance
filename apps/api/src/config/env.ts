@@ -11,8 +11,8 @@ const envSchema = z.object({
     PORT: z.string().default('3001'),
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
     CORS_ORIGIN: z.string().default('http://localhost:5173'),
-    GOOGLE_CLIENT_ID: z.string().min(1),
-    GOOGLE_CLIENT_SECRET: z.string().min(1),
+    GOOGLE_CLIENT_ID: z.string().optional(),
+    GOOGLE_CLIENT_SECRET: z.string().optional(),
     // SMTP for email (optional - kept for backward compatibility)
     SMTP_HOST: z.string().optional(),
     SMTP_PORT: z.string().default('587'),

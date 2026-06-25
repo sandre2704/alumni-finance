@@ -42,23 +42,9 @@ const apiLimiter = rateLimit({
 });
 app.use('/api', apiLimiter);
 
-// CORS configuration
+// CORS configuration - permissive for testing/personal project
 app.use(cors({
-    origin: (origin, callback) => {
-        // Hapus garis miring di belakang jika ada
-        const allowedOrigins = env.CORS_ORIGIN.split(',').map(o => o.trim().replace(/\/+$/, ''));
-
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-
-        const normalizedOrigin = origin.replace(/\/+$/, '');
-
-        if (allowedOrigins.indexOf(normalizedOrigin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+    origin: true, // Allow all origins
     credentials: true,
 }));
 

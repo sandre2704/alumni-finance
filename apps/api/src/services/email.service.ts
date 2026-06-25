@@ -80,6 +80,7 @@ export const emailService = {
 
         // Use SMTP (fallback)
         if (transporter) {
+            console.log(`⏳ [SMTP] Memulai proses pengiriman email ke ${to}...`);
             try {
                 await transporter.sendMail({
                     from: `"Alumni Finance" <${env.SMTP_FROM}>`,
@@ -87,9 +88,9 @@ export const emailService = {
                     subject: 'Verifikasi Email Anda - Alumni Finance',
                     html,
                 });
-                console.log(`✅ Verification email sent to ${to} via SMTP`);
+                console.log(`✅ [SMTP] Berhasil mengirim email verifikasi ke ${to}`);
             } catch (error) {
-                console.error('❌ Failed to send verification email via SMTP:', error);
+                console.error('❌ [SMTP] Gagal mengirim email:', error);
                 throw error;
             }
             return;

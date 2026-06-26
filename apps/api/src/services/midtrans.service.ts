@@ -5,6 +5,7 @@ import { donationTargets } from '../db/schema/donation-targets.js';
 import { categories } from '../db/schema/categories.js';
 import { eq, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
+import { emailService } from './email.service.js';
 
 // Types
 export interface CreateDonationParams {
@@ -24,6 +25,10 @@ export interface MidtransNotification {
     payment_type: string;
     signature_key: string;
     fraud_status?: string;
+    customer_details?: {
+        email?: string;
+        first_name?: string;
+    };
 }
 
 // Initialize Midtrans Snap client
@@ -155,6 +160,21 @@ export const MidtransService = {
 
             console.log('[Midtrans] Snap transaction created:', snapTransaction);
 
+            // Send pending donation receipt email
+            try {
+                await emailService.sendDonationReceiptEmail({
+                    to: donorEmail,
+                    donorName: isAnonymous ? 'Donatur Anonim' : donorName,
+                    amount,
+                    targetName,
+                    orderId,
+                    transactionDate: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+                    status: 'pending',
+                });
+            } catch (emailErr) {
+                console.error('[Midtrans] Failed to send receipt email (non-blocking):', emailErr);
+            }
+
             return {
                 success: true,
                 data: {
@@ -228,6 +248,25 @@ export const MidtransService = {
 
         console.log(`[Midtrans] Payment ${orderId} -> ${newStatus} (transaction: ${updated.id})`);
 
+        // Send success receipt email when payment confirmed
+        if (newStatus === 'paid' && updated.donorName) {
+            try {
+                // Get donor email from order metadata or use a fallback
+                const targetName = updated.description || 'Donasi Umum';
+                await emailService.sendDonationReceiptEmail({
+                    to: notification.customer_details?.email || '',
+                    donorName: updated.donorName,
+                    amount: Number(updated.amount),
+                    targetName,
+                    orderId,
+                    transactionDate: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+                    status: 'success',
+                });
+            } catch (emailErr) {
+                console.error('[Midtrans] Failed to send success receipt email (non-blocking):', emailErr);
+            }
+        }
+
         return {
             success: true,
             status: newStatus,
@@ -239,7 +278,7 @@ export const MidtransService = {
     /**
      * Update transaction status after frontend callback
      */
-    async updateTransactionStatus(transactionId: string, status: 'paid' | 'processing') {
+    async updateTransactionStatus(transactionId: string, status: 'paid' | 'processing', donorEmail?: string) {
         const [updated] = await db
             .update(transactions)
             .set({
@@ -258,6 +297,23 @@ export const MidtransService = {
                     updatedAt: new Date(),
                 })
                 .where(eq(donationTargets.id, updated.donationTargetId));
+        }
+
+        // Send success receipt email
+        if (status === 'paid' && donorEmail) {
+            try {
+                await emailService.sendDonationReceiptEmail({
+                    to: donorEmail,
+                    donorName: updated.donorName || 'Donatur',
+                    amount: Number(updated.amount),
+                    targetName: updated.description || 'Donasi Umum',
+                    orderId: updated.orderId || updated.id,
+                    transactionDate: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+                    status: 'success',
+                });
+            } catch (emailErr) {
+                console.error('[Donation] Failed to send success receipt email (non-blocking):', emailErr);
+            }
         }
 
         return updated;

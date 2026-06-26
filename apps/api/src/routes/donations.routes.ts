@@ -49,7 +49,7 @@ router.post('/create', async (req: Request, res: Response) => {
  */
 router.post('/update-status', async (req: Request, res: Response) => {
     try {
-        const { transactionId, status } = req.body;
+        const { transactionId, status, donorEmail } = req.body;
 
         if (!transactionId || !status) {
             res.status(400).json({
@@ -67,7 +67,7 @@ router.post('/update-status', async (req: Request, res: Response) => {
             return;
         }
 
-        const updated = await MidtransService.updateTransactionStatus(transactionId, status);
+        const updated = await MidtransService.updateTransactionStatus(transactionId, status, donorEmail);
 
         res.json({
             success: true,

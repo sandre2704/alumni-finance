@@ -173,7 +173,7 @@ export const PublicDonationModal: React.FC<PublicDonationModalProps> = ({
 
                 if (paymentResult.status === 'success') {
                     // Update transaction status to paid
-                    await DonationsService.updateStatus(result.transactionId, 'paid');
+                    await DonationsService.updateStatus(result.transactionId, 'paid', donorEmail);
                     setStep('success');
                 } else if (paymentResult.status === 'pending') {
                     setStep('pending');

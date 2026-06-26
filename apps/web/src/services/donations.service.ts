@@ -37,8 +37,8 @@ export const DonationsService = {
     /**
      * Update transaction status after payment
      */
-    async updateStatus(transactionId: string, status: 'paid' | 'processing'): Promise<void> {
-        await apiClient.post('/donations/update-status', { transactionId, status });
+    async updateStatus(transactionId: string, status: 'paid' | 'processing', donorEmail?: string): Promise<void> {
+        await apiClient.post('/donations/update-status', { transactionId, status, donorEmail });
     },
 
     /**

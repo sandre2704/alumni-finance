@@ -104,6 +104,7 @@ export const MidtransService = {
         const [newTransaction] = await db
             .insert(transactions)
             .values({
+                orderId: orderId,
                 type: 'income',
                 categoryId: finalCategoryId,
                 donationTargetId: donationTargetId || null,
@@ -185,13 +186,6 @@ export const MidtransService = {
 
         console.log(`[Midtrans] Order ID: ${orderId}, Status: ${transactionStatus}, Fraud: ${fraudStatus}`);
 
-        // Extract transaction ID from order_id (format: DON-timestamp-nanoid)
-        // We need to look up by the metadata we stored, but since Midtrans doesn't return it,
-        // we'll need to find the transaction by matching order time or use a different approach
-
-        // For now, we'll update based on order_id pattern matching
-        // In production, you'd store order_id in the transaction table
-
         let newStatus: 'paid' | 'processing' = 'processing';
 
         if (transactionStatus === 'capture' || transactionStatus === 'settlement') {
@@ -202,14 +196,43 @@ export const MidtransService = {
             newStatus = 'processing';
         }
 
-        // Note: In a real implementation, you'd store the order_id in your transaction
-        // and update by that. For this demo, we'll log the status.
-        console.log(`[Midtrans] Payment ${orderId} -> ${newStatus}`);
+        // Lookup transaction by order_id and update status
+        const [existingTransaction] = await db
+            .select()
+            .from(transactions)
+            .where(eq(transactions.orderId, orderId))
+            .limit(1);
+
+        if (!existingTransaction) {
+            console.warn(`[Midtrans] No transaction found for order_id: ${orderId}`);
+            return { success: false, status: newStatus, orderId };
+        }
+
+        // Update transaction status
+        const [updated] = await db
+            .update(transactions)
+            .set({ status: newStatus, updatedAt: new Date() })
+            .where(eq(transactions.id, existingTransaction.id))
+            .returning();
+
+        // If paid and linked to a donation target, update currentAmount
+        if (newStatus === 'paid' && updated.donationTargetId) {
+            await db
+                .update(donationTargets)
+                .set({
+                    currentAmount: sql`${donationTargets.currentAmount} + ${updated.amount}`,
+                    updatedAt: new Date(),
+                })
+                .where(eq(donationTargets.id, updated.donationTargetId));
+        }
+
+        console.log(`[Midtrans] Payment ${orderId} -> ${newStatus} (transaction: ${updated.id})`);
 
         return {
             success: true,
             status: newStatus,
             orderId,
+            transactionId: updated.id,
         };
     },
 

@@ -8,6 +8,7 @@ export const transactionStatusEnum = pgEnum('transaction_status', ['paid', 'proc
 
 export const transactions = pgTable('transactions', {
     id: uuid('id').defaultRandom().primaryKey(),
+    orderId: varchar('order_id', { length: 100 }).unique(),
     type: transactionTypeEnum('type').notNull(),
     categoryId: text('category_id').references(() => categories.id),
     donationTargetId: text('donation_target_id').references(() => donationTargets.id),

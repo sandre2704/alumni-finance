@@ -2,10 +2,13 @@ import { Resend } from 'resend';
 import nodemailer from 'nodemailer';
 import { env } from '../config/env.js';
 
-// Prefer SMTP per user request (even though Railway blocks it, we will try)
-// const useResend = !!env.RESEND_API_KEY; // Disabled for now
-const useResend = false;
-const resend = null;
+// Strategy Pattern for Email
+// 1. Try Resend (HTTP API - best for cloud)
+// 2. Try SMTP (Nodemailer - fallback)
+// 3. Dev Mode (Console log only)
+
+const useResend = !!env.RESEND_API_KEY;
+const resend = useResend ? new Resend(env.RESEND_API_KEY) : null;
 
 // SMTP Configuration
 const isSmtpConfigured = !!(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS && env.SMTP_FROM);
@@ -71,12 +74,23 @@ export const emailService = {
             </div>
         `;
 
-        /* Resend logic removed to fix type error and rely on SMTP
-        // Use Resend (HTTP API)
+        // 1. Use Resend (HTTP API)
         if (resend) {
-            // ...
+            console.log(`⏳ [Resend] Memulai proses pengiriman email ke ${to}...`);
+            try {
+                await resend.emails.send({
+                    from: env.RESEND_FROM_EMAIL,
+                    to,
+                    subject: 'Verifikasi Email Anda - Alumni Finance',
+                    html,
+                });
+                console.log(`✅ [Resend] Berhasil mengirim email verifikasi ke ${to}`);
+                return;
+            } catch (error) {
+                console.error('❌ [Resend] Gagal mengirim email:', error);
+                // Fallthrough to SMTP if Resend fails
+            }
         }
-        */
 
         // Use SMTP (fallback)
         if (transporter) {
@@ -129,12 +143,23 @@ export const emailService = {
             </div>
         `;
 
-        /* Resend logic removed to fix type error and rely on SMTP
-        // Use Resend (HTTP API)
+        // 1. Use Resend (HTTP API)
         if (resend) {
-            // ...
+            console.log(`⏳ [Resend] Memulai proses pengiriman email ke ${to}...`);
+            try {
+                await resend.emails.send({
+                    from: env.RESEND_FROM_EMAIL,
+                    to,
+                    subject: 'Reset Password - Alumni Finance',
+                    html,
+                });
+                console.log(`✅ [Resend] Password reset email sent to ${to}`);
+                return;
+            } catch (error) {
+                console.error('❌ [Resend] Failed to send password reset email:', error);
+                // Fallthrough to SMTP if Resend fails
+            }
         }
-        */
 
         // Use SMTP (fallback)
         if (transporter) {

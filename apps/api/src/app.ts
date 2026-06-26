@@ -42,9 +42,11 @@ const apiLimiter = rateLimit({
 });
 app.use('/api', apiLimiter);
 
-// CORS configuration - permissive for testing/personal project
+// CORS configuration - strict in production, permissive in development
 app.use(cors({
-    origin: true, // Allow all origins
+    origin: env.NODE_ENV === 'production'
+        ? env.CORS_ORIGIN.split(',').map(o => o.trim())
+        : true,
     credentials: true,
 }));
 

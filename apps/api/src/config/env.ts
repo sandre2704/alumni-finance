@@ -22,6 +22,10 @@ const envSchema = z.object({
     // Resend Email API (recommended for cloud deployment)
     RESEND_API_KEY: z.string().optional(),
     RESEND_FROM_EMAIL: z.string().default('onboarding@resend.dev'),
+    // Midtrans Payment Gateway
+    MIDTRANS_SERVER_KEY: z.string().optional(),
+    MIDTRANS_CLIENT_KEY: z.string().optional(),
+    MIDTRANS_IS_PRODUCTION: z.string().default('false'),
 });
 
 const parsed = envSchema.safeParse(process.env);

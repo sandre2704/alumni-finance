@@ -30,9 +30,9 @@ export const Login = () => {
         try {
             await login(email, password);
             navigate('/');
-        } catch (err: any) {
+        } catch (err: unknown) {
             // Extract error message
-            const errorMessage = err?.message || '';
+            const errorMessage = err instanceof Error ? err.message : (err as any)?.message || String(err);
 
             // Check for inactive account error
             if (errorMessage === 'ACCOUNT_INACTIVE' ||

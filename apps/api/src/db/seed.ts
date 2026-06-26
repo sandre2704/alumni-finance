@@ -75,7 +75,7 @@ async function seed() {
                 role: 'admin',
                 username: 'admin',
                 profileCompleted: true,
-            }
+            } as any
         });
 
         if (result && result.user) {
@@ -83,9 +83,9 @@ async function seed() {
             console.log('Admin user created via auth.');
         }
 
-    } catch (e: any) {
+    } catch (e: unknown) {
         // If it fails, maybe user exists (race condition or other issue). 
-        console.log('Admin creation note:', e.message || e);
+        console.log('Admin creation note:', e instanceof Error ? e.message : String(e));
     }
 
     if (!adminUser) {

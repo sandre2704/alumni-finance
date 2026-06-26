@@ -36,7 +36,10 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
             throw new AppError(400, errorMessage);
         }
 
-        const category = await categoryService.create(validation.data);
+        const category = await categoryService.create({
+            ...validation.data,
+            monthlyBudget: validation.data.monthlyBudget?.toString()
+        });
 
         sendCreated(res, category);
     } catch (error) {
@@ -55,7 +58,10 @@ router.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
             throw new AppError(400, errorMessage);
         }
 
-        const category = await categoryService.update(req.params.id as string, validation.data as any);
+        const category = await categoryService.update(req.params.id as string, {
+            ...validation.data,
+            monthlyBudget: validation.data.monthlyBudget?.toString()
+        });
 
         sendSuccess(res, category);
     } catch (error) {

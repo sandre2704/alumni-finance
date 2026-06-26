@@ -76,7 +76,7 @@ router.post('/', authMiddleware, async (req: Request, res: Response, next: NextF
             return;
         }
 
-        const userId = (req as any).user?.id;
+        const userId = req.user?.id;
         const transaction = await transactionService.create(validation.data, userId);
 
         res.status(201).json({

@@ -28,7 +28,6 @@ export const useMidtrans = (): UseMidtransReturn => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [config, setConfig] = useState<MidtransConfig | null>(null);
 
     useEffect(() => {
         const loadMidtrans = async () => {
@@ -49,7 +48,7 @@ export const useMidtrans = (): UseMidtransReturn => {
                     throw new Error('Midtrans Client Key belum dikonfigurasi');
                 }
 
-                setConfig(clientConfig);
+
 
                 // Determine Snap URL based on environment
                 const snapUrl = clientConfig.isProduction
@@ -73,8 +72,12 @@ export const useMidtrans = (): UseMidtransReturn => {
                 };
 
                 document.body.appendChild(script);
-            } catch (err: any) {
-                setError(err.message || 'Gagal memuat konfigurasi Midtrans');
+            } catch (err: unknown) {
+                if (err instanceof Error) {
+                    setError(err.message || 'Gagal memuat konfigurasi Midtrans');
+                } else {
+                    setError('Gagal memuat konfigurasi Midtrans');
+                }
                 setIsLoading(false);
             }
         };
@@ -91,19 +94,15 @@ export const useMidtrans = (): UseMidtransReturn => {
 
             window.snap.pay(snapToken, {
                 onSuccess: (result) => {
-                    console.log('[Midtrans] Payment success:', result);
                     resolve({ status: 'success', result });
                 },
                 onPending: (result) => {
-                    console.log('[Midtrans] Payment pending:', result);
                     resolve({ status: 'pending', result });
                 },
                 onError: (result) => {
-                    console.log('[Midtrans] Payment error:', result);
                     resolve({ status: 'error', result });
                 },
                 onClose: () => {
-                    console.log('[Midtrans] Popup closed');
                     resolve({ status: 'closed' });
                 },
             });

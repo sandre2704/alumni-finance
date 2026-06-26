@@ -1,9 +1,9 @@
 import { db } from '../db/index.js';
-import { user as users } from '../db/schema/index.js'; // Aliasing user as users to minimize code changes
-import { eq, ne } from 'drizzle-orm';
+import { user as users, account } from '../db/schema/index.js'; // Aliasing user as users to minimize code changes
+import { eq, ne, and } from 'drizzle-orm';
 import { AppError } from '../middleware/error-handler.js';
 import { auth } from '../lib/auth.js';
-
+import { hashPassword } from "better-auth/crypto";
 class UserService {
 
     async getNonAdminUsers() {
@@ -116,11 +116,20 @@ class UserService {
         if (data.isActive !== undefined) updateData.isActive = data.isActive;
         if (data.role) updateData.role = data.role;
 
-        // Password update is complex with better-auth manual update, skipping for now or use auth.api if possible
-        // For now preventing password update via this endpoint or needs specific handling
         if (data.password) {
-            // TODO: Implement password update via better-auth
-            // await auth.api.changePassword({ ... }) requires current password or session
+            const hashedPassword = await hashPassword(data.password);
+            
+            const existingAccount = await db.query.account.findFirst({
+                where: and(eq(account.userId, id), eq(account.providerId, 'credential'))
+            });
+
+            if (existingAccount) {
+                await db.update(account)
+                    .set({ password: hashedPassword, updatedAt: new Date() })
+                    .where(eq(account.id, existingAccount.id));
+            } else {
+                throw new AppError(400, "User tidak memiliki akun kredensial untuk update password.");
+            }
         }
 
         const [updatedUser] = await db.update(users)

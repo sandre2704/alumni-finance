@@ -28,6 +28,12 @@ export interface UpdateUserData {
     role?: string;
 }
 
+export interface ChangePasswordData {
+    oldPassword?: string;
+    newPassword?: string;
+    confirmPassword?: string;
+}
+
 export const UserService = {
     getAll: async (): Promise<User[]> => {
         const { data } = await apiClient.get('/users');
@@ -53,7 +59,7 @@ export const UserService = {
         await apiClient.delete(`/users/${id}`);
     },
 
-    changePassword: async (data: any): Promise<void> => {
+    changePassword: async (data: ChangePasswordData): Promise<void> => {
         await apiClient.post('/profile/change-password', data);
     },
 };

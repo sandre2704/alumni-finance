@@ -8,7 +8,7 @@ const router: Router = Router();
 
 // Middleware to check if user is admin
 const adminOnly = (req: Request, res: Response, next: NextFunction) => {
-    const user = (req as any).user;
+    const user = req.user;
     if (!user || user.role !== 'admin') {
         throw new AppError(403, 'Akses ditolak. Hanya admin yang dapat mengakses fitur ini.');
     }

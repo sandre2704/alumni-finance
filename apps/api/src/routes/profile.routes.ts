@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { profileService } from '../services/profile.service.js';
 import { auth } from '../lib/auth.js';
 import { fromNodeHeaders } from 'better-auth/node';
+import { AuthUser } from '../types/index.js';
 
 const router: Router = Router();
 
@@ -18,7 +19,7 @@ async function getCurrentUser(req: Request, res: Response, next: NextFunction) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
-        (req as any).user = session.user;
+        req.user = session.user as unknown as AuthUser;
         next();
     } catch (error) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -31,7 +32,7 @@ async function getCurrentUser(req: Request, res: Response, next: NextFunction) {
  */
 router.post('/complete', getCurrentUser, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const userId = (req as any).user.id;
+        const userId = req.user!.id;
         const { username, password, confirmPassword } = req.body;
 
         // Validate required fields
@@ -57,7 +58,7 @@ router.post('/complete', getCurrentUser, async (req: Request, res: Response, nex
  */
 router.get('/status', getCurrentUser, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const userId = (req as any).user.id;
+        const userId = req.user!.id;
         const status = await profileService.getProfileStatus(userId);
         res.json(status);
     } catch (error) {
@@ -122,7 +123,7 @@ router.get('/get-user-status-by-email/:email', async (req: Request, res: Respons
  */
 router.post('/change-password', getCurrentUser, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const userId = (req as any).user.id;
+        const userId = req.user!.id;
         const { oldPassword, newPassword, confirmPassword } = req.body;
 
         // Validate

@@ -176,6 +176,8 @@ export const PublicDonationModal: React.FC<PublicDonationModalProps> = ({
                     await DonationsService.updateStatus(result.transactionId, 'paid', donorEmail);
                     setStep('success');
                 } else if (paymentResult.status === 'pending') {
+                    // Send email for pending status too (most payment methods return pending first)
+                    await DonationsService.updateStatus(result.transactionId, 'processing', donorEmail);
                     setStep('pending');
                 } else if (paymentResult.status === 'closed') {
                     // User closed the popup without completing

@@ -25,6 +25,7 @@ export interface MidtransNotification {
     payment_type: string;
     signature_key: string;
     fraud_status?: string;
+    custom_field1?: string;
     customer_details?: {
         email?: string;
         first_name?: string;
@@ -143,6 +144,8 @@ export const MidtransService = {
             callbacks: {
                 finish: `${process.env.CORS_ORIGIN?.split(',')[0] || 'http://localhost:5173'}/donation-info?status=success`,
             },
+            // Custom fields are returned in webhook notifications
+            custom_field1: donorEmail,
             // Store our transaction ID in metadata
             metadata: {
                 transaction_id: newTransaction.id,
@@ -251,17 +254,21 @@ export const MidtransService = {
         // Send success receipt email when payment confirmed
         if (newStatus === 'paid' && updated.donorName) {
             try {
-                // Get donor email from order metadata or use a fallback
+                // Get donor email from custom_field1 (we sent it during creation) or fallback
                 const targetName = updated.description || 'Donasi Umum';
-                await emailService.sendDonationReceiptEmail({
-                    to: notification.customer_details?.email || '',
-                    donorName: updated.donorName,
-                    amount: Number(updated.amount),
-                    targetName,
-                    orderId,
-                    transactionDate: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
-                    status: 'success',
-                });
+                const donorEmail = notification.custom_field1 || statusResponse.custom_field1 || statusResponse.customer_details?.email || '';
+                
+                if (donorEmail) {
+                    await emailService.sendDonationReceiptEmail({
+                        to: donorEmail,
+                        donorName: updated.donorName,
+                        amount: Number(updated.amount),
+                        targetName,
+                        orderId,
+                        transactionDate: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+                        status: 'success',
+                    });
+                }
             } catch (emailErr) {
                 console.error('[Midtrans] Failed to send success receipt email (non-blocking):', emailErr);
             }

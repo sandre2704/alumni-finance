@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { DonationsService, MidtransConfig } from '../services/donations.service';
+import { DonationsService } from '../services/donations.service';
 
 declare global {
     interface Window {

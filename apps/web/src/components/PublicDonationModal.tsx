@@ -39,12 +39,12 @@ export const PublicDonationModal: React.FC<PublicDonationModalProps> = ({
     const [step, setStep] = useState<DonationStep>('form');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [transactionId, setTransactionId] = useState<string | null>(null);
+
 
     // Hooks
     const { data: donationTargets } = useDonationTargets();
     const { data: categories } = useCategories();
-    const { isLoaded: isMidtransLoaded, isLoading: isMidtransLoading, pay } = useMidtrans();
+    const { isLoaded: isMidtransLoaded, pay } = useMidtrans();
 
     // Data filtering
     const activeTargets = donationTargets?.filter(t => t.isActive) || [];
@@ -64,7 +64,7 @@ export const PublicDonationModal: React.FC<PublicDonationModalProps> = ({
             setPaymentMethod('midtrans');
             setStep('form');
             setError(null);
-            setTransactionId(null);
+
 
             // Logic for Preselected Target vs Default Category
             if (preselectedTarget) {
@@ -165,7 +165,7 @@ export const PublicDonationModal: React.FC<PublicDonationModalProps> = ({
                     isAnonymous,
                 });
 
-                setTransactionId(result.transactionId);
+
                 setStep('processing');
 
                 // Open Midtrans Snap popup

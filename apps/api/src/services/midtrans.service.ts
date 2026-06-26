@@ -256,7 +256,7 @@ export const MidtransService = {
             try {
                 // Get donor email from custom_field1 (we sent it during creation) or fallback
                 const targetName = updated.description || 'Donasi Umum';
-                const donorEmail = notification.custom_field1 || statusResponse.custom_field1 || statusResponse.customer_details?.email || '';
+                const donorEmail = notification.custom_field1 || (statusResponse as any).custom_field1 || (statusResponse as any).customer_details?.email || '';
                 
                 if (donorEmail) {
                     await emailService.sendDonationReceiptEmail({

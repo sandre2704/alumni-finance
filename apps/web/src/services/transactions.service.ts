@@ -12,6 +12,10 @@ export interface Transaction {
     donationTargetId?: string | null;
     receiptUrl?: string | null;
     userId: string;
+    status: 'paid' | 'processing' | 'pending_bendahara' | 'pending_admin' | 'rejected';
+    approvedByBendaharaId?: string | null;
+    approvedByAdminId?: string | null;
+    rejectionReason?: string | null;
     createdAt: string;
     updatedAt: string;
 }
@@ -26,7 +30,7 @@ export interface CreateTransactionCommon {
     donorName?: string;
     isAnonymous?: boolean;
     receiptUrl?: string;
-    status?: 'paid' | 'processing';
+    status?: 'paid' | 'processing' | 'pending_bendahara' | 'pending_admin' | 'rejected';
 }
 
 export type CreateTransactionInput = CreateTransactionCommon | CreateTransactionCommon[];
@@ -56,5 +60,15 @@ export const TransactionsService = {
 
     delete: async (id: string) => {
         await apiClient.delete(`/transactions/${id}`);
+    },
+
+    approve: async (id: string) => {
+        const { data } = await apiClient.post<{ data: Transaction }>(`/transactions/${id}/approve`, {});
+        return data.data;
+    },
+
+    reject: async (id: string, reason: string) => {
+        const { data } = await apiClient.post<{ data: Transaction }>(`/transactions/${id}/reject`, { reason });
+        return data.data;
     },
 };

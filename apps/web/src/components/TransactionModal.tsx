@@ -3,6 +3,7 @@ import { useCategories } from '../hooks/useCategories';
 import { useCreateTransaction, useUpdateTransaction } from '../hooks/useTransactions';
 import { useDonationTargets } from '../hooks/useDonationTargets';
 import { Transaction } from '../services/transactions.service';
+import { useAuth } from '../context/AuthContext';
 
 interface TransactionModalProps {
     isOpen: boolean;
@@ -29,6 +30,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onCl
     const { mutate: createTransaction, isPending: isCreatePending } = useCreateTransaction();
     const { mutate: updateTransaction, isPending: isUpdatePending } = useUpdateTransaction();
     const { data: donationTargets } = useDonationTargets();
+    const { user } = useAuth();
 
     const isPending = isCreatePending || isUpdatePending;
 
@@ -66,9 +68,12 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onCl
                 setIsDonation(false);
                 setDonationTargetId('');
                 setDate(new Date().toISOString().split('T')[0]); // Default to today
+                if (user?.role === 'alumni') {
+                    setTransactionType('Pengeluaran');
+                }
             }
         }
-    }, [isOpen, transaction]);
+    }, [isOpen, transaction, user]);
 
     if (!isOpen) return null;
 
@@ -180,7 +185,9 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onCl
             <div className="relative z-20 w-full max-w-[640px] flex flex-col max-h-[95vh] bg-white dark:bg-[#111122] rounded-xl border border-gray-200 dark:border-[#333366] shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] overflow-hidden animate-fade-in-up transition-colors duration-200">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 dark:border-[#333366]">
-                    <h3 className="text-gray-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">{transaction ? 'Edit Transaksi' : 'Catat Transaksi Baru'}</h3>
+                    <h3 className="text-gray-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">
+                        {transaction ? 'Edit Transaksi' : (user?.role === 'alumni' ? 'Ajukan Pengeluaran' : 'Catat Transaksi Baru')}
+                    </h3>
                     <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:text-[#9292c8] dark:hover:text-white transition-colors">
                         <span className="material-symbols-outlined">close</span>
                     </button>
@@ -188,39 +195,41 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onCl
 
                 {/* Body */}
                 <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6 bg-white dark:bg-[#111122]">
-                    {/* Transaction Type Toggle */}
-                    <div className="flex">
-                        <div className="flex h-12 flex-1 items-center justify-center rounded-lg bg-gray-100 dark:bg-[#242447] p-1">
-                            <label className={`group flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-md px-2 transition-all ${transactionType === 'Pemasukan' ? 'bg-white dark:bg-primary shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-[#9292c8] hover:text-gray-900 dark:hover:text-white'}`}>
-                                <span className="truncate text-sm font-medium">Pemasukan</span>
-                                <input
-                                    className="hidden"
-                                    name="transaction_type"
-                                    type="radio"
-                                    value="Pemasukan"
-                                    checked={transactionType === 'Pemasukan'}
-                                    onChange={() => {
-                                        setTransactionType('Pemasukan');
-                                        setCategoryId('');
-                                    }}
-                                />
-                            </label>
-                            <label className={`group flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-md px-2 transition-all ${transactionType === 'Pengeluaran' ? 'bg-white dark:bg-primary shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-[#9292c8] hover:text-gray-900 dark:hover:text-white'}`}>
-                                <span className="truncate text-sm font-medium">Pengeluaran</span>
-                                <input
-                                    className="hidden"
-                                    name="transaction_type"
-                                    type="radio"
-                                    value="Pengeluaran"
-                                    checked={transactionType === 'Pengeluaran'}
-                                    onChange={() => {
-                                        setTransactionType('Pengeluaran');
-                                        setCategoryId('');
-                                    }}
-                                />
-                            </label>
+                    {/* Transaction Type Toggle (Hidden for Alumni) */}
+                    {user?.role !== 'alumni' && (
+                        <div className="flex">
+                            <div className="flex h-12 flex-1 items-center justify-center rounded-lg bg-gray-100 dark:bg-[#242447] p-1">
+                                <label className={`group flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-md px-2 transition-all ${transactionType === 'Pemasukan' ? 'bg-white dark:bg-primary shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-[#9292c8] hover:text-gray-900 dark:hover:text-white'}`}>
+                                    <span className="truncate text-sm font-medium">Pemasukan</span>
+                                    <input
+                                        className="hidden"
+                                        name="transaction_type"
+                                        type="radio"
+                                        value="Pemasukan"
+                                        checked={transactionType === 'Pemasukan'}
+                                        onChange={() => {
+                                            setTransactionType('Pemasukan');
+                                            setCategoryId('');
+                                        }}
+                                    />
+                                </label>
+                                <label className={`group flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-md px-2 transition-all ${transactionType === 'Pengeluaran' ? 'bg-white dark:bg-primary shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-[#9292c8] hover:text-gray-900 dark:hover:text-white'}`}>
+                                    <span className="truncate text-sm font-medium">Pengeluaran</span>
+                                    <input
+                                        className="hidden"
+                                        name="transaction_type"
+                                        type="radio"
+                                        value="Pengeluaran"
+                                        checked={transactionType === 'Pengeluaran'}
+                                        onChange={() => {
+                                            setTransactionType('Pengeluaran');
+                                            setCategoryId('');
+                                        }}
+                                    />
+                                </label>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Dynamic input based on type */}
                     <label className="flex flex-col w-full">

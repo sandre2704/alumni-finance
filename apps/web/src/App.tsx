@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Dashboard } from './pages/Dashboard';
 import { Transactions } from './pages/Transactions';
+import { Approvals } from './pages/Approvals';
 import { Reports } from './pages/Reports';
 import { Donations } from './pages/Donations';
 import { Settings } from './pages/Settings';
@@ -65,6 +66,7 @@ const AppContent = () => {
                 <Route element={<Layout />}>
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/transactions" element={<Transactions />} />
+                    <Route path="/approvals" element={<Approvals />} />
                     <Route path="/reports" element={<Reports />} />
                     <Route path="/donations" element={<Donations />} />
                     <Route path="/donation-info" element={<DonationInfo />} />

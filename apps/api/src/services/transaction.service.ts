@@ -151,7 +151,7 @@ class TransactionService {
             description: data.description,
             donorName: data.donorName,
             isAnonymous: data.isAnonymous || false,
-            status: data.status || 'paid',
+            status: data.status || (data.type === 'expense' ? 'pending_bendahara' : 'paid'),
             transactionDate: data.transactionDate,
             receiptUrl: data.receiptUrl,
             createdBy: userId,
@@ -260,7 +260,61 @@ class TransactionService {
             }
         }
 
-        await db.delete(transactions).where(eq(transactions.id, id));
+        return await db.delete(transactions).where(eq(transactions.id, id)).returning();
+    }
+
+    async approveTransaction(id: string, checkerId: string, checkerRole: string) {
+        const existing = await this.getById(id);
+        
+        if (existing.type !== 'expense') {
+            throw new Error('Hanya transaksi pengeluaran yang butuh persetujuan');
+        }
+
+        if (existing.createdBy === checkerId) {
+            throw new Error('Anda tidak dapat menyetujui pengajuan Anda sendiri');
+        }
+
+        let updateData: any = { updatedAt: new Date() };
+
+        if (checkerRole === 'bendahara' && existing.status === 'pending_bendahara') {
+            updateData.status = 'pending_admin';
+            updateData.approvedByBendaharaId = checkerId;
+        } else if (checkerRole === 'admin' && existing.status === 'pending_admin') {
+            updateData.status = 'paid';
+            updateData.approvedByAdminId = checkerId;
+        } else {
+            throw new Error(`Role ${checkerRole} tidak berhak melakukan approve pada status ${existing.status}`);
+        }
+
+        const [updated] = await db.update(transactions)
+            .set(updateData)
+            .where(eq(transactions.id, id))
+            .returning();
+            
+        return updated;
+    }
+
+    async rejectTransaction(id: string, checkerId: string, reason: string) {
+        const existing = await this.getById(id);
+
+        if (existing.type !== 'expense') {
+            throw new Error('Hanya transaksi pengeluaran yang butuh persetujuan');
+        }
+
+        if (existing.status !== 'pending_bendahara' && existing.status !== 'pending_admin') {
+            throw new Error('Transaksi ini tidak sedang dalam status pending');
+        }
+
+        const [updated] = await db.update(transactions)
+            .set({
+                status: 'rejected',
+                rejectionReason: reason,
+                updatedAt: new Date()
+            })
+            .where(eq(transactions.id, id))
+            .returning();
+            
+        return updated;
     }
 
     async updateReceipt(id: string, receiptUrl: string) {

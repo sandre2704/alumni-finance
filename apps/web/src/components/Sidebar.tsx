@@ -23,6 +23,7 @@ export const Sidebar = ({ isOpen, onClose, isCollapsed = false }: SidebarProps) 
         { path: '/', label: 'Dashboard', icon: 'dashboard' },
         { path: '/reports', label: 'Laporan', icon: 'bar_chart' },
         { path: '/transactions', label: 'Transaksi', icon: 'receipt_long' },
+        ...(user ? [{ path: '/approvals', label: 'Persetujuan', icon: 'fact_check' }] : []),
         { path: '/donations', label: 'Donasi', icon: 'volunteer_activism' },
         { path: '/donation-info', label: 'Info Transfer', icon: 'info' },
         ...(user ? [{ path: '/settings', label: 'Pengaturan', icon: 'settings' }] : []),

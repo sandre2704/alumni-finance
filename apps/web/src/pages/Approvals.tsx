@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { TransactionModal } from '../components/TransactionModal';
 import { AttachmentModal } from '../components/AttachmentModal';
 import { ConfirmationModal } from '../components/ConfirmationModal';
-import { useTransactions, useDeleteTransaction } from '../hooks/useTransactions';
+import { useTransactions, useApproveTransaction, useRejectTransaction } from '../hooks/useTransactions';
 import { useCategories } from '../hooks/useCategories';
 import { useAuth } from '../hooks/useAuth';
 import { Transaction } from '../services/transactions.service';
@@ -24,7 +24,7 @@ const formatDate = (dateString: string) => {
     });
 };
 
-export const Transactions = () => {
+export const Approvals = () => {
     const { user } = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
@@ -38,8 +38,14 @@ export const Transactions = () => {
         isOpen: false,
         id: null
     });
+    const [rejectModal, setRejectModal] = useState<{ isOpen: boolean; id: string | null; reason: string }>({
+        isOpen: false,
+        id: null,
+        reason: ''
+    });
     const { data: transactions, isLoading } = useTransactions();
-    const { mutate: deleteTransaction } = useDeleteTransaction();
+    const { mutate: approveTransaction, isPending: isApprovePending } = useApproveTransaction();
+    const { mutate: rejectTransaction, isPending: isRejectPending } = useRejectTransaction();
     const { data: categories } = useCategories();
 
     // Date initialization
@@ -99,9 +105,16 @@ export const Transactions = () => {
             if (tDate > filters.endDate) return false;
         }
 
-        // Only show paid or processing transactions in the main Transactions view
-        if (['pending_bendahara', 'pending_admin', 'rejected'].includes(t.status)) {
-            return false;
+        // Approval Logic Filtering
+        if (user?.role === 'bendahara') {
+            if (t.status !== 'pending_bendahara') return false;
+        } else if (user?.role === 'admin') {
+            if (t.status !== 'pending_admin') return false;
+        } else if (user?.role === 'alumni') {
+            if (t.createdBy !== user.id) return false;
+            if (!['pending_bendahara', 'pending_admin', 'rejected'].includes(t.status)) return false;
+        } else {
+            return false; // Unknown role or not logged in
         }
 
         return true;
@@ -130,15 +143,29 @@ export const Transactions = () => {
         setIsModalOpen(true);
     };
 
-    const handleDelete = (id: string) => {
-        setDeleteConfirmation({ isOpen: true, id });
-    };
-
     const confirmDelete = () => {
         if (deleteConfirmation.id) {
-            deleteTransaction(deleteConfirmation.id, {
-                onError: (err) => alert('Gagal menghapus transaksi: ' + err.message)
+            // Note: Keep this for compilation, but in Approvals we don't delete, we reject.
+            setDeleteConfirmation({ isOpen: false, id: null });
+        }
+    };
+
+    const handleApprove = (id: string) => {
+        if (window.confirm('Apakah Anda yakin ingin menyetujui pengajuan ini?')) {
+            approveTransaction(id, {
+                onError: (err: any) => alert('Gagal menyetujui transaksi: ' + err.message)
             });
+        }
+    };
+
+    const submitReject = () => {
+        if (rejectModal.id && rejectModal.reason) {
+            rejectTransaction({ id: rejectModal.id, reason: rejectModal.reason }, {
+                onSuccess: () => setRejectModal({ isOpen: false, id: null, reason: '' }),
+                onError: (err: any) => alert('Gagal menolak transaksi: ' + err.message)
+            });
+        } else {
+            alert('Alasan penolakan wajib diisi');
         }
     };
 
@@ -147,21 +174,9 @@ export const Transactions = () => {
             {/* Page Heading & Action */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Daftar Transaksi</h1>
-                    <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">Kelola pemasukan dan pengeluaran dana alumni.</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Persetujuan Pengeluaran</h1>
+                    <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">Kelola antrean persetujuan dana keluar.</p>
                 </div>
-                {user && (
-                    <button
-                        onClick={() => {
-                            setSelectedTransaction(null);
-                            setIsModalOpen(true);
-                        }}
-                        className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium h-10 px-5 rounded-lg transition-colors shadow-lg shadow-primary/25"
-                    >
-                        <span className="material-symbols-outlined text-[20px]">add</span>
-                        <span>Tambah Baru</span>
-                    </button>
-                )}
             </div>
 
             {/* Desktop Filters & Search Toolbar */}
@@ -531,20 +546,30 @@ export const Transactions = () => {
                                         {user && (
                                             <td className="px-6 py-4 whitespace-nowrap text-center">
                                                 <div className="flex items-center justify-center gap-1">
-                                                    <button
-                                                        onClick={() => handleEdit(t)}
-                                                        className="p-1 text-slate-400 hover:text-blue-500 transition-colors"
-                                                        title="Edit"
-                                                    >
-                                                        <span className="material-symbols-outlined text-[20px]">edit</span>
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(t.id)}
-                                                        className="p-1 text-slate-400 hover:text-red-500 transition-colors"
-                                                        title="Hapus"
-                                                    >
-                                                        <span className="material-symbols-outlined text-[20px]">delete</span>
-                                                    </button>
+                                                    {(user.role === 'bendahara' && t.status === 'pending_bendahara') || (user.role === 'admin' && t.status === 'pending_admin') ? (
+                                                        <>
+                                                            <button
+                                                                onClick={() => handleApprove(t.id)}
+                                                                disabled={isApprovePending}
+                                                                className="p-1 text-emerald-500 hover:text-emerald-700 transition-colors disabled:opacity-50"
+                                                                title="Approve"
+                                                            >
+                                                                <span className="material-symbols-outlined text-[20px]">check_circle</span>
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setRejectModal({ isOpen: true, id: t.id, reason: '' })}
+                                                                disabled={isRejectPending}
+                                                                className="p-1 text-red-500 hover:text-red-700 transition-colors disabled:opacity-50"
+                                                                title="Reject"
+                                                            >
+                                                                <span className="material-symbols-outlined text-[20px]">cancel</span>
+                                                            </button>
+                                                        </>
+                                                    ) : (
+                                                        <span className="text-xs text-slate-500 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                                                            {t.status === 'rejected' ? 'Ditolak' : 'Menunggu'}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </td>
                                         )}
@@ -689,10 +714,41 @@ export const Transactions = () => {
                 onClose={() => setDeleteConfirmation({ isOpen: false, id: null })}
                 onConfirm={confirmDelete}
                 title="Hapus Transaksi"
-                message="Apakah Anda yakin ingin menghapus transaksi ini? Data yang dihapus tidak dapat dikembalikan."
+                message="Apakah Anda yakin ingin menghapus transaksi ini? Data yang sudah dihapus tidak dapat dikembalikan."
                 confirmText="Hapus"
                 isDestructive
             />
+
+            {/* Reject Modal */}
+            {rejectModal.isOpen && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setRejectModal({ isOpen: false, id: null, reason: '' })}></div>
+                    <div className="relative z-20 w-full max-w-md bg-white dark:bg-[#111122] rounded-xl border border-gray-200 dark:border-[#333366] shadow-lg overflow-hidden p-6">
+                        <h3 className="text-xl font-bold mb-4 dark:text-white">Alasan Penolakan</h3>
+                        <textarea
+                            className="w-full p-3 rounded-lg border border-gray-300 dark:border-[#333366] bg-gray-50 dark:bg-[#1a1a33] dark:text-white focus:ring-2 focus:ring-primary focus:outline-none mb-4 min-h-[100px]"
+                            placeholder="Tuliskan alasan mengapa pengajuan ini ditolak..."
+                            value={rejectModal.reason}
+                            onChange={(e) => setRejectModal({ ...rejectModal, reason: e.target.value })}
+                        />
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setRejectModal({ isOpen: false, id: null, reason: '' })}
+                                className="px-4 py-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white"
+                            >
+                                Batal
+                            </button>
+                            <button
+                                onClick={submitReject}
+                                disabled={isRejectPending || !rejectModal.reason}
+                                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg disabled:opacity-50 transition-colors"
+                            >
+                                Tolak Pengajuan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

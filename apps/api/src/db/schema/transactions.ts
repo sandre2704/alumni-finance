@@ -4,7 +4,7 @@ import { categories } from './categories.js';
 import { donationTargets } from './donation-targets.js';
 
 export const transactionTypeEnum = pgEnum('transaction_type', ['income', 'expense']);
-export const transactionStatusEnum = pgEnum('transaction_status', ['paid', 'processing']);
+export const transactionStatusEnum = pgEnum('transaction_status', ['paid', 'processing', 'pending_bendahara', 'pending_admin', 'rejected']);
 
 export const transactions = pgTable('transactions', {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -19,6 +19,9 @@ export const transactions = pgTable('transactions', {
     status: transactionStatusEnum('status').default('paid').notNull(),
     receiptUrl: text('receipt_url'),
     createdBy: text('created_by').references(() => user.id),
+    approvedByBendaharaId: text('approved_by_bendahara_id').references(() => user.id),
+    approvedByAdminId: text('approved_by_admin_id').references(() => user.id),
+    rejectionReason: text('rejection_reason'),
     transactionDate: date('transaction_date').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),

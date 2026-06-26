@@ -55,3 +55,26 @@ export const useDeleteTransaction = () => {
         },
     });
 };
+
+export const useApproveTransaction = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id: string) => TransactionsService.approve(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['transactions'] });
+            queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+        },
+    });
+};
+
+export const useRejectTransaction = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ id, reason }: { id: string; reason: string }) => TransactionsService.reject(id, reason),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['transactions'] });
+        },
+    });
+};

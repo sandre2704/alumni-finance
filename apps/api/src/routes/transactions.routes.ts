@@ -14,7 +14,7 @@ const createTransactionSchema = z.object({
     description: z.string().optional(),
     donorName: z.string().optional(),
     isAnonymous: z.boolean().optional().default(false),
-    status: z.enum(['paid', 'processing']).optional().default('paid'),
+    status: z.enum(['paid', 'processing', 'pending_bendahara', 'pending_admin', 'rejected']).optional().default('paid'),
     transactionDate: z.string(),
     receiptUrl: z.string().optional(),
 });
@@ -24,7 +24,7 @@ const updateTransactionSchema = createTransactionSchema.partial();
 const querySchema = z.object({
     type: z.enum(['income', 'expense']).optional(),
     categoryId: z.string().uuid().optional(),
-    status: z.enum(['paid', 'processing']).optional(),
+    status: z.enum(['paid', 'processing', 'pending_bendahara', 'pending_admin', 'rejected']).optional(),
     startDate: z.string().optional(),
     endDate: z.string().optional(),
     search: z.string().optional(),
@@ -132,6 +132,47 @@ router.post('/:id/receipt', authMiddleware, async (req: Request, res: Response, 
 
         res.json({
             success: true,
+            data: transaction,
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Approve transaction
+router.post('/:id/approve', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.user?.id;
+        const userRole = req.user?.role || 'guest';
+        
+        if (!userId) throw new AppError(401, 'Unauthorized');
+        
+        const transaction = await transactionService.approveTransaction(req.params.id as string, userId, userRole);
+
+        res.json({
+            success: true,
+            message: 'Transaction approved',
+            data: transaction,
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Reject transaction
+router.post('/:id/reject', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.user?.id;
+        const { reason } = req.body;
+        
+        if (!userId) throw new AppError(401, 'Unauthorized');
+        if (!reason) throw new AppError(400, 'Rejection reason is required');
+        
+        const transaction = await transactionService.rejectTransaction(req.params.id as string, userId, reason);
+
+        res.json({
+            success: true,
+            message: 'Transaction rejected',
             data: transaction,
         });
     } catch (error) {

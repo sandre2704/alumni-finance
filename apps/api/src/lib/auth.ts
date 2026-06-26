@@ -74,7 +74,7 @@ export const auth = betterAuth({
         },
     },
     rateLimit: {
-        enabled: true,
+        enabled: env.NODE_ENV === 'production', // Disable strict rate limiting in dev to avoid 429s during hot reload
         window: 60, // 60 detik
         max: 100, // Maximum 100 request per menit untuk auth endpoints
     },
